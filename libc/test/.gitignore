@@ -1,0 +1,14 @@
+bdos
+dalocmem
+dfind
+dgfileat
+dgftime
+dgtime
+dopen
+dstime
+int86
+int86x
+intdos
+intdosx
+strlwr
+strtime
