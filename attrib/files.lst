@@ -1,0 +1,15 @@
+Contents
+--------
+
+attrib.lsm   - package description file
+attrib.txt   - main documentation for ATTRIB
+files.lst    - this file
+plans.txt    - list of suggestions for ATTRIB
+history.txt  - detailed version history
+copying      - GNU license file
+attrib.c     - ATTRIB utility source code
+types.h      - header file with common defines, macroses and types
+*.inc        - include files; replacement for BC++ 3.1 RTL modules
+turboc.cfg   - Borland C configuration file
+makefile     - MAKE's script file to compile ATTRIB
+cc.bat       - batch file to compile ATTRIB
