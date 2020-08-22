@@ -1,0 +1,34 @@
+DOSix: The (never-obsolete) DOS on top of a Unix kernel
+=======================================================
+
+DOSix aims to be a complete DOS-like operating system on top of
+Unix-like kernels and the X Window System.
+
+In its core is a high-level POSIX-targeted implementation of the IBM
+PC BIOS, the DOS kernel and the DOS standard C library that provides
+source compatibility for DOS applications, making the task of porting
+such software almost trivial.
+
+In DOSix, DOS software is native and able to run on modern hardware
+(even on non-x86 architectures), alongside modern POSIX applications,
+having none of the well-known memory, storage, multi-tasking and
+networking limitations imposed by original DOS.
+
+DOSix user-land programs are FLOSS software genuinely written and
+designed to run on classical DOS implementations like FreeDOS and
+MS-DOS.
+
+Based on the same architecture and philosophy, and in extension of its
+initial scope, DOSix is planned to eventually support OS/2 and Windows
+applications as well, mimicking historic development of real operating
+system programming APIs, making it an useful educational resource for
+those interested in the technical and nostalgic aspects thereof.
+
+Ultimately DOSix is an experiment to explore how meaningful and useful
+are FLOSS re-implementations of proprietary operating systems as
+high-level libraries and directly ported-over applications running on
+top of POSIX-based systems.  How much is preserved?  How are the
+usability and feeling affected?  How well can we emulate the original
+interface and approximate its semantics?  How coherent and
+well-behaved the resulting system is?  How practical is it as a
+standalone system?
