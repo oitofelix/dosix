@@ -76,12 +76,12 @@ typedef struct _SREGS
 /*** Pointer macros  ***/
 
 /* Make a far pointer */
-#define _MK_FP(seg,offset) ((void *) (((uintmax_t) (seg) << 0x10)	\
-					   | ((uintmax_t) (offset))))
+#define _MK_FP(seg,offset) ((void *) (((uintptr_t) (seg) << 0x10)	\
+				      | ((uintptr_t) (offset))))
 /* Return segment of far pointer */
-#define _FP_SEG(address) ((uintmax_t) (address) >> 0x10)
+#define _FP_SEG(address) ((uintptr_t) (address) >> 0x10)
 /* Return offset of far pointer */
-#define _FP_OFF(address) ((uintmax_t) (address) & ((0x01 << 0x10) - 0x01))
+#define _FP_OFF(address) ((uintptr_t) (address) & ((0x01 << 0x10) - 0x01))
 
 #define MK_FP _MK_FP
 #define FP_SEG _FP_SEG
