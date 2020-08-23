@@ -35,27 +35,29 @@ extern "C" {
 
 typedef struct _WORDREGS
 {
-  uint16_t ax;
-  uint16_t bx;
-  uint16_t cx;
-  uint16_t dx;
-  uintmax_t si;
-  uintmax_t di;
-  uint16_t cflag;
+  uintmax_t ax, bx, cx, dx;
+  uintmax_t si, di;
+  uintmax_t cflag;
 } _WORDREGS;
 
 typedef struct _BYTEREGS
 {
-  uint8_t al, ah;
-  uint8_t bl, bh;
-  uint8_t cl, ch;
-  uint8_t dl, dh;
+  uintmax_t al : 1 * 8;
+  uintmax_t ah : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t bl : 1 * 8;
+  uintmax_t bh : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t cl : 1 * 8;
+  uintmax_t ch : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t dl : 1 * 8;
+  uintmax_t dh : (sizeof (uintmax_t) - 1) * 8;
 } _BYTEREGS;
 
 typedef union _REGS
 {
+  struct _WORDREGS r;
   struct _WORDREGS x;
   struct _BYTEREGS h;
+  struct _BYTEREGS l;
 } _REGS;
 
 typedef struct _SREGS
@@ -76,12 +78,11 @@ typedef struct _SREGS
 /*** Pointer macros  ***/
 
 /* Make a far pointer */
-#define _MK_FP(seg,offset) ((void *) (((uintptr_t) (seg) << 0x10)	\
-				      | ((uintptr_t) (offset))))
+#define _MK_FP(seg,offset) ((void *) ((uintptr_t) (offset)))
 /* Return segment of far pointer */
-#define _FP_SEG(address) ((uintptr_t) (address) >> 0x10)
+#define _FP_SEG(address) ((uintptr_t) 0)
 /* Return offset of far pointer */
-#define _FP_OFF(address) ((uintptr_t) (address) & ((0x01 << 0x10) - 0x01))
+#define _FP_OFF(address) ((uintptr_t) (address))
 
 #define MK_FP _MK_FP
 #define FP_SEG _FP_SEG

@@ -83,17 +83,14 @@ _dosk_findnext
   return errorinfo.exterror;
 }
 
-int
+void
 _dosk86_findnext
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->h.ah == INT21_AH_FINDNEXT);
-  outregs->x.ax = _dosk_findnext ();
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FINDNEXT);
+  cpu->r.ax = _dosk_findnext ();
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
 unsigned

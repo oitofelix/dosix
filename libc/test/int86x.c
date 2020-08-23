@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <process.h>
 
-char  far *filename = "_int86x.c";
+char  far *filename = "int86x.c";
 
 void main( void )
 {
@@ -28,5 +28,5 @@ void main( void )
       printf( "Can't get file attributes; error no. %d\n", result);
 
    else
-      printf( "Attribs = 0x%.4x\n", outregs.x.cx );
+      printf( "Attribs = 0x%.4llx\n", outregs.x.cx );
 }

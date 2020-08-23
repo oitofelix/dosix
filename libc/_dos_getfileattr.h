@@ -20,10 +20,10 @@
 #ifndef _INC__DOS_GETFILEATTR
 #define _INC__DOS_GETFILEATTR
 
-int
+#include "cpu.h"
+
+void
 _dosk86_getfileattr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

@@ -20,14 +20,14 @@
 #ifndef _INC__DOSK_WRITE_STDOUT
 #define _INC__DOSK_WRITE_STDOUT
 
+#include "cpu.h"
+
 unsigned
 _dosk_write_stdout
 (const char *string);
 
-int
+void
 _dosk86_write_stdout
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

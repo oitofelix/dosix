@@ -44,24 +44,21 @@ _dos_settime
   return 0;
 }
 
-int
+void
 _dosk86_settime
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->h.ah == INT21_AH_SETTIME);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_SETTIME);
   struct _dostime_t time =
     {
-     .hour = inregs->h.ch,
-     .minute = inregs->h.cl,
-     .second = inregs->h.dh,
-     .hsecond = inregs->h.dl
+     .hour = cpu->h.ch,
+     .minute = cpu->l.cl,
+     .second = cpu->h.dh,
+     .hsecond = cpu->l.dl
     };
   /* AL = result
      00h successful
      FFh invalid time, system time unchanged */
-  outregs->h.al = _dos_settime (&time) ? 0xff : 0x00;
-  return outregs->x.ax;
+  cpu->l.al = _dos_settime (&time) ? 0xff : 0x00;
 }

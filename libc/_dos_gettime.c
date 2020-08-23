@@ -21,8 +21,9 @@
 #include <time.h>
 #include <sys/time.h>
 #include "timeconv.h"
-#include "include/dos.h"
+#include "cpu.h"
 #include "INT.h"
+#include "include/dos.h"
 
 void
 _dos_gettime
@@ -35,19 +36,16 @@ _dos_gettime
   __dostime_struct (&tv, NULL, time);
 }
 
-int
+void
 _dosk86_gettime
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->h.ah == INT21_AH_GETTIME);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_GETTIME);
   struct _dostime_t time;
   _dos_gettime (&time);
-  outregs->h.ch = time.hour;
-  outregs->h.cl = time.minute;
-  outregs->h.dh = time.second;
-  outregs->h.dl = time.hsecond;
-  return outregs->x.ax;
+  cpu->h.ch = time.hour;
+  cpu->l.cl = time.minute;
+  cpu->h.dh = time.second;
+  cpu->l.dl = time.hsecond;
 }

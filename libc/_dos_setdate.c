@@ -44,23 +44,20 @@ _dos_setdate
   return 0;
 }
 
-int
+void
 _dosk86_setdate
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->h.ah == INT21_AH_SETDATE);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_SETDATE);
   struct _dosdate_t date =
     {
-     .year = inregs->x.cx,
-     .month = inregs->h.dh,
-     .day = inregs->h.dl
+     .year = cpu->r.cx,
+     .month = cpu->h.dh,
+     .day = cpu->l.dl
     };
   /* AL = result
      00h successful
      FFh invalid time, system time unchanged */
-  outregs->h.al = _dos_setdate (&date) ? 0xff : 0x00;
-  return outregs->x.ax;
+  cpu->l.al = _dos_setdate (&date) ? 0xff : 0x00;
 }

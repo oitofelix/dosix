@@ -20,13 +20,11 @@
 #ifndef _INC_SYSCALL_T
 #define _INC_SYSCALL_T
 
-#include "include/dos.h"
+#include "cpu.h"
 
 typedef
-int
+void
 (*syscall_t)
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *);
 
 #endif

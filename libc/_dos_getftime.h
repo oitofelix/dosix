@@ -20,10 +20,8 @@
 #ifndef _INC__DOS_GETFTIME
 #define _INC__DOS_GETFTIME
 
-int
+void
 _dosk86_getftime
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

@@ -20,10 +20,8 @@
 #ifndef _INC__DOS_SETDATE
 #define _INC__DOS_SETDATE
 
-int
+void
 _dosk86_setdate
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

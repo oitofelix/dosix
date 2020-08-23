@@ -11,7 +11,7 @@ void main( void )
    int fh;
 
    /* Open file with _dos_open function */
-   if( _dos_open( "data1", _O_RDONLY, &fh ) != 0 )
+   if( _dos_open( "dopen.com", _O_RDONLY, &fh ) != 0 )
       perror( "Open failed on input file\n" );
    else
       printf( "Open succeeded on input file\n" );

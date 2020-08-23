@@ -26,11 +26,9 @@ _dosk_findfirst
  unsigned attrib,
  unsigned append_flag);
 
-int
+void
 _dosk86_findfirst
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 unsigned
 _dos_findfirst

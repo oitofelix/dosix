@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include <sys/stat.h>
+#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 
@@ -52,16 +53,14 @@ _dos_setfileattr
   return 0;
 }
 
-int
+void
 _dosk86_setfileattr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->x.ax == INT21_AX_SETFILEATTR);
-  outregs->x.ax = _dos_setfileattr (_MK_FP (segregs->ds, inregs->x.dx),
-				    inregs->x.cx);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FILE_METADATA);
+  assert (cpu->l.al == INT21_AL_FILE_METADATA_SETFILEATTR);
+  cpu->r.ax = _dos_setfileattr (_MK_FP (cpu->r.ds, cpu->r.dx),
+				cpu->r.cx);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }

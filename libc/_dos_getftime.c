@@ -44,20 +44,18 @@ _dos_getftime
   return err ? err: 0;
 }
 
-int
+void
 _dosk86_getftime
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->x.ax == INT21_AX_GETFTIME);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FILE_TIME);
+  assert (cpu->l.al == INT21_AL_FILE_TIME_GETFTIME);
   unsigned date, time;
-  outregs->x.ax = _dos_getftime (inregs->x.bx,
-				 &date,
-				 &time);
-  outregs->x.cx = time;
-  outregs->x.dx = date;
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  cpu->r.ax = _dos_getftime (cpu->r.bx,
+			     &date,
+			     &time);
+  cpu->r.cx = time;
+  cpu->r.dx = date;
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }

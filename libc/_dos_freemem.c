@@ -67,15 +67,12 @@ _dos_freemem
   return 0;
 }
 
-int
+void
 _dosk86_freemem
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_FREEMEM);
-  outregs->x.ax = _dos_freemem (segregs->es);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FREEMEM);
+  cpu->r.ax = _dos_freemem (cpu->r.es);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }

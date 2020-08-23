@@ -20,10 +20,8 @@
 #ifndef _INC__DOS_SETBLOCK
 #define _INC__DOS_SETBLOCK
 
-int
+void
 _dosk86_setblock
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

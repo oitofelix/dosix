@@ -109,19 +109,16 @@ _dosk_findfirst
   return _dosk_findnext ();
 }
 
-int
+void
 _dosk86_findfirst
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_FINDFIRST);
-  outregs->x.ax = _dosk_findfirst (_MK_FP (segregs->ds, inregs->x.dx),
-				   inregs->x.cx,
-				   inregs->h.al);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FINDFIRST);
+  cpu->r.ax = _dosk_findfirst (_MK_FP (cpu->r.ds, cpu->r.dx),
+			       cpu->r.cx,
+			       cpu->l.al);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
 unsigned

@@ -26,15 +26,12 @@ unsigned
 _dosk_findnext
 (void);
 
-int
+void
 _dosk86_findnext
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 unsigned
 _dos_findnext
 (struct _find_t *fileinfo);
-
 
 #endif

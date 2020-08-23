@@ -20,10 +20,8 @@
 #ifndef _INC__DOS_FREEMEM
 #define _INC__DOS_FREEMEM
 
-int
+void
 _dosk86_freemem
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

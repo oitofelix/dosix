@@ -18,6 +18,7 @@
 */
 
 #include <assert.h>
+#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 #include "include/_fcntl.h"
@@ -81,14 +82,12 @@ _dos_open
   return 0;
 }
 
-int
+void
 _dosk86_open
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_OPEN);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_OPEN);
   /* Documentation says:
 
      CL = attribute mask of files to look for (server call only)
@@ -96,11 +95,9 @@ _dosk86_open
      What should we do about it?  Now it’s simply ignored.
  */
   int handle;
-  outregs->x.ax = _dos_open (_MK_FP (segregs->ds, inregs->x.dx),
-			     inregs->h.al,
-			     &handle);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  if (! outregs->x.ax)
-    outregs->x.ax = handle;
-  return outregs->x.ax;
+  cpu->r.ax = _dos_open (_MK_FP (cpu->r.ds, cpu->r.dx),
+			 cpu->l.al,
+			 &handle);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
+  cpu->r.ax = cpu->r.ax ? cpu->r.ax : handle;
 }

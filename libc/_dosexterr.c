@@ -653,27 +653,25 @@ _dosexterr
   return errorinfo.exterror;
 }
 
-int
+void
 _dosk86exterr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_EXTERR);
-  assert (inregs->x.bx == INT21_BX_EXTERR);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_EXTERR);
+  assert (cpu->h.bh == INT21_BH_EXTERR);
+  assert (cpu->l.bl == INT21_BL_EXTERR);
   struct _DOSERROR errorinfo;
   _dosexterr (&errorinfo);
-  outregs->x.ax = errorinfo.exterror;
-  outregs->h.bh = errorinfo.errclass;
-  outregs->h.bl = errorinfo.action;
-  outregs->h.ch = errorinfo.locus;
+  cpu->r.ax = errorinfo.exterror;
+  cpu->h.bh = errorinfo.errclass;
+  cpu->l.bl = errorinfo.action;
+  cpu->h.ch = errorinfo.locus;
   if (errorinfo.exterror == EXTERR_DSK_CHANGE_INVAL)
     {
-      segregs->es = _FP_SEG (&media_id);
-      outregs->x.di = _FP_OFF (&media_id);
+      cpu->r.es = _FP_SEG (&media_id);
+      cpu->r.di = _FP_OFF (&media_id);
     }
-  return outregs->x.ax;
 }
 
 void
@@ -695,14 +693,12 @@ __doskexterr_set
   errno = 0;
 }
 
-int
+void
 __dosk86exterr_set
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->x.ax == INT2F_AX_EXTERR_SET);
-  __doskexterr_set (_MK_FP (segregs->ss, inregs->x.si));
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT2F_AH_DOS_INTERNAL);
+  assert (cpu->l.al == INT2F_AL_DOS_INTERNAL_EXTERR_SET);
+  __doskexterr_set (_MK_FP (cpu->r.ss, cpu->r.si));
 }

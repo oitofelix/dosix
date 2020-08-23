@@ -112,21 +112,18 @@ _dos_allocmem
     }
 }
 
-int
+void
 _dosk86_allocmem
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->h.ah == INT21_AH_ALLOCMEM);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_ALLOCMEM);
   uintptr_t seg;
-  outregs->x.ax = _dos_allocmem (inregs->x.bx,
-				 &seg);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  if (outregs->x.cflag)
-    outregs->x.bx = seg;
+  cpu->r.ax = _dos_allocmem (cpu->r.bx,
+			     &seg);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
+  if (cpu->r.flags)
+    cpu->r.bx = seg;
   else
-    outregs->x.ax = seg;
-  return outregs->x.ax;
+    cpu->r.ax = seg;
 }

@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "INT.h"
+#include "cpu.h"
 #include "include/dos.h"
 
 unsigned
@@ -60,18 +61,16 @@ _dos_getfileattr
   return 0;
 }
 
-int
+void
 _dosk86_getfileattr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->x.ax == INT21_AX_GETFILEATTR);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FILE_METADATA);
+  assert (cpu->l.al == INT21_AL_FILE_METADATA_GETFILEATTR);
   unsigned attrib;
-  outregs->x.ax = _dos_getfileattr (_MK_FP (segregs->ds, inregs->x.dx),
-				    &attrib);
-  outregs->x.cx = attrib;
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  cpu->r.ax = _dos_getfileattr (_MK_FP (cpu->r.ds, cpu->r.dx),
+				&attrib);
+  cpu->r.cx = attrib;
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }

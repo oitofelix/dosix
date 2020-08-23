@@ -20,8 +20,9 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "include/dos.h"
 #include "INT.h"
+#include "include/dos.h"
+#include "_dosk_write_stdout.h"
 
 unsigned
 _dosk_write_stdout
@@ -35,15 +36,12 @@ _dosk_write_stdout
   return '$';
 }
 
-int
+void
 _dosk86_write_stdout
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_WRITE_STDOUT);
-  outregs->x.ax = _dosk_write_stdout (_MK_FP (segregs->ds,
-					      inregs->x.dx));
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_WRITE_STDOUT);
+  cpu->r.ax = _dosk_write_stdout (_MK_FP (cpu->r.ds,
+					  cpu->r.dx));
 }

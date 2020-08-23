@@ -20,14 +20,14 @@
 #ifndef _INC__DOSK_GET_DTA_ADDR
 #define _INC__DOSK_GET_DTA_ADDR
 
+#include "cpu.h"
+
 union dta_t *
 _dosk_get_dta_addr
 (void);
 
-int
+void
 _dosk86_get_dta_addr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

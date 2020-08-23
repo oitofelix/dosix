@@ -62,18 +62,15 @@ _dos_setftime
   return 0;
 }
 
-
-int
+void
 _dosk86_setftime
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->x.ax == INT21_AX_SETFTIME);
-  outregs->x.ax = _dos_setftime (inregs->x.bx,
-				 inregs->x.dx,
-				 inregs->x.cx);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_FILE_TIME);
+  assert (cpu->l.al == INT21_AL_FILE_TIME_SETFTIME);
+  cpu->r.ax = _dos_setftime (cpu->r.bx,
+			     cpu->r.dx,
+			     cpu->r.cx);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
 }

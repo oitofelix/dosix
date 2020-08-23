@@ -1,5 +1,5 @@
 /*
-  _dos_open.h -- Open existing file (DOS 2+)
+  cpu.h -- 8086 CPU registers
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,11 +17,37 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC__DOS_OPEN
-#define _INC__DOS_OPEN
+#ifndef _INC_CPU
+#define _INC_CPU
 
-void
-_dosk86_open
-(cpu_t *cpu);
+#include <stdint.h>
+
+typedef struct cpu_word
+{
+  uintmax_t ax, bx, cx, dx;
+  uintmax_t si, di, bp, sp;
+  uintmax_t ip;
+  uintmax_t cs, ds, es, ss;
+  uintmax_t flags;
+} cpu_word_t;
+
+typedef struct cpu_byte
+{
+  uintmax_t al : 1 * 8;
+  uintmax_t ah : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t bl : 1 * 8;
+  uintmax_t bh : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t cl : 1 * 8;
+  uintmax_t ch : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t dl : 1 * 8;
+  uintmax_t dh : (sizeof (uintmax_t) - 1) * 8;
+} cpu_byte_t;
+
+typedef union cpu
+{
+  cpu_word_t r;
+  cpu_byte_t l;
+  cpu_byte_t h;
+} cpu_t;
 
 #endif

@@ -1,5 +1,5 @@
 /*
-  _dos_open.h -- Open existing file (DOS 2+)
+  interrupt.h -- Execute 8086 interrupt passing all registers
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,11 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC__DOS_OPEN
-#define _INC__DOS_OPEN
+#ifndef _INC_INTERRUPT
+#define _INC_INTERRUPT
 
 void
-_dosk86_open
-(cpu_t *cpu);
+interrupt
+(uint8_t intnum,
+ cpu_t *cpu);
 
 #endif

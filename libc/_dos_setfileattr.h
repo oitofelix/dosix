@@ -20,10 +20,8 @@
 #ifndef _INC__DOSSETFILEATTR
 #define _INC__DOSSETFILEATTR
 
-int
+void
 _dosk86_setfileattr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

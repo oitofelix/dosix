@@ -20,10 +20,8 @@
 #ifndef _INC__DOS_CLOSE
 #define _INC__DOS_CLOSE
 
-int
+void
 _dosk86_close
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

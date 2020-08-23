@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include "_dosk_dta.h"
+#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 
@@ -31,14 +32,11 @@ _dosk_set_dta_addr
   _dosk_current_dta = target_dta;
 }
 
-int
+void
 _dosk86_set_dta_addr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_SET_DTA_ADDR);
-  _dosk_set_dta_addr (_MK_FP (segregs->ds, inregs->x.dx));
-  return outregs->x.ax;
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_SET_DTA_ADDR);
+  _dosk_set_dta_addr (_MK_FP (cpu->r.ds, cpu->r.dx));
 }

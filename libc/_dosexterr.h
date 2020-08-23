@@ -20,6 +20,7 @@
 #ifndef _INC__DOSEXTERR
 #define _INC__DOSEXTERR
 
+#include "cpu.h"
 #include "include/dos.h"
 
 /*** DOS extended error code ***/
@@ -411,20 +412,16 @@ int
 _dosexterr
 (struct _DOSERROR *_errorinfo);
 
-int
+void
 _dosk86exterr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 void
 __doskexterr_set
 (struct _DOSERROR *new_errorinfo);
 
-int
+void
 __dosk86exterr_set
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

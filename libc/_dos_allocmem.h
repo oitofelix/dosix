@@ -36,10 +36,8 @@ _dosk__allocmem_cmp
 (const void *_a,
  const void *_b);
 
-int
+void
 _dosk86_allocmem
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

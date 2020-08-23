@@ -64,20 +64,16 @@ _dos_setblock
   return 0;
 }
 
-int
+void
 _dosk86_setblock
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs), assert (segregs);
-  assert (inregs->h.ah == INT21_AH_SETBLOCK);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_SETBLOCK);
   uintptr_t maxsize;
-  outregs->x.ax = _dos_setblock (inregs->x.bx,
-				 segregs->es,
-				 &maxsize);
-  outregs->x.cflag = outregs->x.ax ? ~0 : 0;
-  if (outregs->x.cflag)
-    outregs->x.bx = maxsize;
-  return outregs->x.ax;
+  cpu->r.ax = _dos_setblock (cpu->r.bx,
+			     cpu->r.es,
+			     &maxsize);
+  cpu->r.flags = cpu->r.ax ? 1 : 0;
+  cpu->r.bx = cpu->r.flags ? maxsize : cpu->r.bx;
 }

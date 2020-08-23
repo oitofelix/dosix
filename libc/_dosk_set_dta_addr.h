@@ -21,15 +21,14 @@
 #define _INC__DOSK_SET_DTA_ADDR
 
 #include "_dosk_dta.h"
+#include "cpu.h"
 
 void
 _dosk_set_dta_addr
 (union dta_t *target_dta);
 
-int
+void
 _dosk86_set_dta_addr
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
+(cpu_t *cpu);
 
 #endif

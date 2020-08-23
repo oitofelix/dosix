@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <time.h>
 #include <sys/time.h>
+#include "cpu.h"
 #include "INT.h"
 #include "timeconv.h"
 #include "include/dos.h"
@@ -35,19 +36,16 @@ _dos_getdate
   __dostime_struct (&tv, date, NULL);
 }
 
-int
+void
 _dosk86_getdate
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs)
+(cpu_t *cpu)
 {
-  assert (inregs), assert (outregs);
-  assert (inregs->h.ah == INT21_AH_GETDATE);
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_GETDATE);
   struct _dosdate_t date;
   _dos_getdate (&date);
-  outregs->x.cx = date.year;
-  outregs->h.dh = date.month;
-  outregs->h.dl = date.day;
-  outregs->h.al = date.dayofweek; /* DOS 1.10+ */
-  return outregs->x.ax;
+  cpu->r.cx = date.year;
+  cpu->h.dh = date.month;
+  cpu->l.dl = date.day;
+  cpu->l.al = date.dayofweek; /* DOS 1.10+ */
 }
