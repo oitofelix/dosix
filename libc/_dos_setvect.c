@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _dos_setvect.c -- Set interrupt vector (DOS 1+)
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,27 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
-
+#include <assert.h>
+#include "_dosk_vect.h"
+#include "INT.h"
 #include "include/dos.h"
 
 void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
+_dos_setvect
+(unsigned intnum,
+ syscall_t syscall)
+{
+  assert (syscall);
+  assert (intnum < UINT8_MAX);
+  _dosk_vect[intnum] = syscall;
+}
 
-#endif
+void
+_dosk86_setvect
+(cpu_t *cpu)
+{
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_SETVECT);
+  _dos_setvect (cpu->l.al,
+		_MK_FP (cpu->r.ds, cpu->r.dx));
+}

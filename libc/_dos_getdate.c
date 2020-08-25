@@ -20,7 +20,6 @@
 #include <assert.h>
 #include <time.h>
 #include <sys/time.h>
-#include "cpu.h"
 #include "INT.h"
 #include "timeconv.h"
 #include "include/dos.h"

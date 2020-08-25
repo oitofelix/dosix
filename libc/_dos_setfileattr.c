@@ -19,7 +19,6 @@
 
 #include <assert.h>
 #include <sys/stat.h>
-#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 
@@ -31,11 +30,7 @@ _dos_setfileattr
   struct _DOSERROR errorinfo;
   struct stat fs;
   if (stat (path, &fs))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
 
   mode_t mode = fs.st_mode;
 
@@ -44,11 +39,7 @@ _dos_setfileattr
   else mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
 
   if (chmod (path, mode))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
 
   return 0;
 }

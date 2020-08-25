@@ -19,7 +19,6 @@
 
 #include <assert.h>
 #include "_dosk_dta.h"
-#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 

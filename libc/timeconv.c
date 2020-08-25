@@ -47,9 +47,7 @@ __unixtime_struct
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      __doskexterr_set (&errorinfo);
-      errno = EINVAL;
-      return errorinfo.exterror;
+      return __doskexterr_set (&errorinfo, EINVAL);
     }
   tv->tv_sec = utime;
   tv->tv_usec = time->hsecond * 10000;
@@ -71,8 +69,7 @@ __dostime_struct
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      __doskexterr_set (&errorinfo);
-      return errorinfo.exterror;
+      return __doskexterr_set (&errorinfo, 0);
     }
   if (date)
     *date = (struct _dosdate_t)
@@ -118,8 +115,7 @@ __unixtime_int
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      __doskexterr_set (&errorinfo);
-      return errorinfo.exterror;
+      return __doskexterr_set (&errorinfo, 0);
     }
   if (utime)
     *utime = _utime;
@@ -142,8 +138,7 @@ __dostime_int
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      __doskexterr_set (&errorinfo);
-      return errorinfo.exterror;
+      return __doskexterr_set (&errorinfo, 0);
     }
   if (date)
     *date = tm->tm_year - (1980 - 1900) << 9

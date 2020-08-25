@@ -29,10 +29,42 @@
 extern "C" {
 #endif
 
-/*** 8086 CPU registers ***/
-#ifndef _REGS_DEFINED
-#define _REGS_DEFINED
+/*** CPU ***/
+typedef struct cpu_word
+{
+  uintmax_t ax, bx, cx, dx;
+  uintmax_t si, di, bp, sp;
+  uintmax_t ip;
+  uintmax_t cs, ds, es, ss;
+  uintmax_t flags;
+} cpu_word_t;
 
+typedef struct cpu_byte
+{
+  uintmax_t al : 1 * 8;
+  uintmax_t ah : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t bl : 1 * 8;
+  uintmax_t bh : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t cl : 1 * 8;
+  uintmax_t ch : (sizeof (uintmax_t) - 1) * 8;
+  uintmax_t dl : 1 * 8;
+  uintmax_t dh : (sizeof (uintmax_t) - 1) * 8;
+} cpu_byte_t;
+
+typedef union cpu
+{
+  cpu_word_t r;
+  cpu_byte_t l;
+  cpu_byte_t h;
+} cpu_t;
+
+/*** syscall_t ***/
+typedef
+void
+(*syscall_t)
+(cpu_t *);
+
+/*** 8086 CPU registers ***/
 typedef struct _WORDREGS
 {
   uintmax_t ax, bx, cx, dx;
@@ -73,12 +105,40 @@ typedef struct _SREGS
 #define REGS _REGS
 #define SREGS _SREGS
 
-#endif
+typedef struct
+{
+  uintmax_t r_ax, r_bx, r_cx, r_dx;
+  uintmax_t r_bp, r_si, r_di;
+  uintmax_t r_ds, r_es;
+  uintmax_t r_flags;
+} IREGS;
+
+union REGPACK
+{
+  struct
+  {
+    uintmax_t al : 1 * 8;
+    uintmax_t ah : (sizeof (uintmax_t) - 1) * 8;
+    uintmax_t bl : 1 * 8;
+    uintmax_t bh : (sizeof (uintmax_t) - 1) * 8;
+    uintmax_t cl : 1 * 8;
+    uintmax_t ch : (sizeof (uintmax_t) - 1) * 8;
+    uintmax_t dl : 1 * 8;
+    uintmax_t dh : (sizeof (uintmax_t) - 1) * 8;
+  } h;
+  struct
+  {
+    uintmax_t ax, bx, cx, dx;
+    uintmax_t bp, si, di;
+    uintmax_t ds, es;
+    uintmax_t flags;
+  } x;
+};
 
 /*** Pointer macros  ***/
 
 /* Make a far pointer */
-#define _MK_FP(seg,offset) ((void *) ((uintptr_t) (offset)))
+#define _MK_FP(seg,offset) ((void *) ((((uintptr_t) (seg)) & 0) | (uintptr_t) (offset)))
 /* Return segment of far pointer */
 #define _FP_SEG(address) ((uintptr_t) 0)
 /* Return offset of far pointer */
@@ -89,9 +149,6 @@ typedef struct _SREGS
 #define FP_OFF _FP_OFF
 
 /*** DOS find functions ***/
-
-#ifndef _FIND_T_DEFINED
-#define _FIND_T_DEFINED
 
 struct _find_t
   {
@@ -134,7 +191,6 @@ struct _find_t
 };
 
 #define find_t _find_t
-#endif
 
 /* File attributes */
 #define _A_NORMAL 0x00
@@ -160,9 +216,6 @@ _dos_findnext
 (struct _find_t *fileinfo);
 
 /*** dosexterr ***/
-#ifndef _DOSERROR_DEFINED
-#define _DOSERROR_DEFINED
-
 struct _DOSERROR
 {
   int exterror;
@@ -183,17 +236,12 @@ struct DOSERROR
 int
 dosexterr
 (struct DOSERROR *);
-#endif
 
 int
 _dosexterr
 (struct _DOSERROR *);
 
 /*** date and time ***/
-
-#ifndef _DATETIME_T_DEFINED
-
-#define _DATETIME_T_DEFINED
 
 struct _dosdate_t
 {
@@ -213,8 +261,6 @@ struct _dostime_t
 
 #define dosdate_t _dosdate_t
 #define dostime_t _dostime_t
-
-#endif
 
 int
 _int86x
@@ -247,6 +293,12 @@ _intdos
  union _REGS *outregs);
 
 #define intdos _intdos
+
+void intr
+(int intnum,
+ union REGPACK *regs);
+
+#define intrpt(intnum,regs) intr((intnum), (union REGPACK*) (regs))
 
 int
 _bdos
@@ -344,6 +396,15 @@ _dos_setdate
 (struct _dosdate_t *date);
 
 #define dos_setdate _dos_setdate
+
+void
+_dos_setvect
+(unsigned intnum,
+ syscall_t syscall);
+
+syscall_t
+_dos_getvect
+(unsigned intnum);
 
 #endif
 

@@ -20,8 +20,6 @@
 #ifndef _INC__DOS_GETFILEATTR
 #define _INC__DOS_GETFILEATTR
 
-#include "cpu.h"
-
 void
 _dosk86_getfileattr
 (cpu_t *cpu);

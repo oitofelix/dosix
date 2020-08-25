@@ -661,7 +661,7 @@ _dosk86exterr
   assert (cpu->h.ah == INT21_AH_EXTERR);
   assert (cpu->h.bh == INT21_BH_EXTERR);
   assert (cpu->l.bl == INT21_BL_EXTERR);
-  struct _DOSERROR errorinfo;
+  struct _DOSERROR errorinfo = {0};
   _dosexterr (&errorinfo);
   cpu->r.ax = errorinfo.exterror;
   cpu->h.bh = errorinfo.errclass;
@@ -674,9 +674,9 @@ _dosk86exterr
     }
 }
 
-void
+int
 __doskexterr_set
-(struct _DOSERROR *new_errorinfo)
+(struct _DOSERROR *new_errorinfo, int _errno)
 {
   if (new_errorinfo->exterror != EXTERR_DONT_CHANGE)
     errorinfo.exterror = new_errorinfo->exterror;
@@ -688,9 +688,10 @@ __doskexterr_set
     errorinfo.locus = new_errorinfo->locus;
   /* update _doserrno on behalf of libc */
   _doserrno = errorinfo.exterror;
-  /* prevent _dosexterr from interpreting a previous libc error, so it
-     reports the current exterr */
-  errno = 0;
+  /* note: use zero _errno to prevent _dosexterr from interpreting a
+     previous libc error, so it reports the current exterr */
+  errno = _errno;
+  return errorinfo.exterror;
 }
 
 void
@@ -700,5 +701,5 @@ __dosk86exterr_set
   assert (cpu);
   assert (cpu->h.ah == INT2F_AH_DOS_INTERNAL);
   assert (cpu->l.al == INT2F_AL_DOS_INTERNAL_EXTERR_SET);
-  __doskexterr_set (_MK_FP (cpu->r.ss, cpu->r.si));
+  __doskexterr_set (_MK_FP (cpu->r.ss, cpu->r.si), 0);
 }

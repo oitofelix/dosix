@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _dosk_vect.c -- Interrupt vector table
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
-
+#include "INT.h"
+#include "_dosk_int21_main_dos_api.h"
+#include "_dosk_int2f_multiplex.h"
 #include "include/dos.h"
 
-void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
-
-#endif
+syscall_t _dosk_vect[UINT8_MAX] =
+  {
+   [INT21_MAIN_DOS_API] = _dosk_int21_main_dos_api,
+   [INT2F_MULTIPLEX] = _dosk_int2f_multiplex
+  };

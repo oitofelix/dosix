@@ -1,5 +1,5 @@
 /*
-  dta.c -- Disk Transfer Area (DOS 1+)
+  _dosk_dta.c -- Disk Transfer Area (DOS 1+)
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 

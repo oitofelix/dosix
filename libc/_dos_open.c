@@ -18,7 +18,6 @@
 */
 
 #include <assert.h>
-#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 #include "include/_fcntl.h"
@@ -37,11 +36,7 @@ _dos_open
     | (mode & _O_RDWR ? O_RDWR : 0);
   int fd = open (path, flags);
   if (fd < 0)
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   if (! (mode & _SH_DENYNO))
     {
       struct flock flock =
@@ -55,28 +50,16 @@ _dos_open
 	 .l_len = 0		/* Lock the entire file */
 	};
       if (fcntl (fd, F_SETLK, &flock) == -1)
-	{
-	  /* TODO? better error handling */
-	  _dosexterr (&errorinfo);
-	  return errorinfo.exterror;
-	}
+	return _dosexterr (&errorinfo);	/* TODO? better error handling */
     }
   if (mode & _O_NOINHERIT)
     {
       int flags = fcntl (fd, F_GETFD, 0);
       if (flags == -1)
-	{
-	  /* TODO? better error handling */
-	  _dosexterr (&errorinfo);
-	  return errorinfo.exterror;
-	}
+	return _dosexterr (&errorinfo);	/* TODO? better error handling */
       flags |= FD_CLOEXEC;
       if (fcntl (fd, F_SETFD, flags) == -1)
-	{
-	  /* TODO? better error handling */
-	  _dosexterr (&errorinfo);
-	  return errorinfo.exterror;
-	}
+	return _dosexterr (&errorinfo);	/* TODO? better error handling */
     }
   *handle = fd;
   return 0;

@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _getch.h -- Read a single character from console without echo
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
-
-#include "include/dos.h"
+#ifndef _INC__GETCH
+#define _INC__GETCH
 
 void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
+_dosk86_getch
+(cpu_t *cpu);
+
+void
+_dosk86_getche
+(cpu_t *cpu);
 
 #endif

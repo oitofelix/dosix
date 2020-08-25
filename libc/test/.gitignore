@@ -12,3 +12,5 @@ intdos
 intdosx
 strlwr
 strtime
+cputs
+getch

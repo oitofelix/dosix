@@ -28,11 +28,7 @@ _dos_close
 {
   struct _DOSERROR errorinfo = {0};
   if (close (handle))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 

@@ -41,27 +41,27 @@ errfunc
       errorinfo.errclass = ERRCLASS_ACCESS_DENIED;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      __doskexterr_set (&errorinfo);
+      return __doskexterr_set (&errorinfo, 0);
       break;
     case ENOENT:
       errorinfo.exterror = EXTERR_PATH_NOT_FOUND;
       errorinfo.errclass = ERRCLASS_NOT_FOUND;
       errorinfo.action = ERRACT_PROMPT_USR_REENTER_INPUT;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      __doskexterr_set (&errorinfo);
+      return __doskexterr_set (&errorinfo, 0);
       break;
     case EIO:
       errorinfo.exterror = EXTERR_READ_FAULT;
       errorinfo.errclass = ERRCLASS_MEDIA_ERROR;
       errorinfo.action = ERRACT_RETRY_AFTER_USR_INTERV;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      __doskexterr_set (&errorinfo);
+      return __doskexterr_set (&errorinfo, 0);
       break;
     default:		/* Get generic error handling based on libc */
       errno = error_code;
+      return 1;
       break;
     }
-  return 1;
 }
 
 unsigned
@@ -81,24 +81,21 @@ _dosk_findfirst
       break;
     case GLOB_ABORTED:
       globfree (pglob);
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
+      return _dosexterr (&errorinfo);
     case GLOB_NOMATCH:
       globfree (pglob);
       errorinfo.exterror = EXTERR_FILE_NOT_FOUND;
       errorinfo.errclass = ERRCLASS_NOT_FOUND;
       errorinfo.action = ERRACT_PROMPT_USR_REENTER_INPUT;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      __doskexterr_set (&errorinfo);
-      return EXTERR_FILE_NOT_FOUND;
+      return __doskexterr_set (&errorinfo, 0);
     case GLOB_NOSPACE:
       globfree (pglob);
       errorinfo.exterror = EXTERR_INSUF_MEM;
       errorinfo.errclass = ERRCLASS_OUT_OF_RESOURCE;
       errorinfo.action = ERRACT_IMMEDIATE_ABORT;
       errorinfo.locus = ERRLOCUS_MEM_RELATED;
-      __doskexterr_set (&errorinfo);
-      return EXTERR_INSUF_MEM;
+      return __doskexterr_set (&errorinfo, 0);
     default:			/* should never get here */
       assert (false);
     };

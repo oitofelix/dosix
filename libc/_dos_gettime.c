@@ -21,7 +21,6 @@
 #include <time.h>
 #include <sys/time.h>
 #include "timeconv.h"
-#include "cpu.h"
 #include "INT.h"
 #include "include/dos.h"
 

@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _dosk_int2f_multiplex.c -- Int 2F handler; multiplex
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,30 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
-
-#include "include/dos.h"
+#include <assert.h>
+#include <stddef.h>
+#include "INT.h"
+#include "call_syscall.h"
+#include "_dosexterr.h"
 
 void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
-
-#endif
+_dosk_int2f_multiplex
+(cpu_t *cpu)
+{
+  assert (cpu);
+  syscall_t syscall = NULL;
+  switch (cpu->h.ah) /* AH */
+    {
+    case INT2F_AH_DOS_INTERNAL: /* 0x12 */
+      switch (cpu->l.al) /* AL */
+	{
+	case INT2F_AL_DOS_INTERNAL_EXTERR_SET: /* 0x22 */
+	  syscall = __dosk86exterr_set;
+	  break;
+	}
+      break;
+    };
+  call_syscall (INT2F_MULTIPLEX,
+		cpu,
+		syscall);
+}

@@ -33,11 +33,7 @@ _dos_getftime
   struct _DOSERROR errorinfo = {0};
   struct stat fs;
   if (fstat (handle, &fs))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   unsigned err = __dostime_int (&fs.st_mtime,
 				date,
 				time);

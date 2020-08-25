@@ -49,8 +49,7 @@ _dos_setblock
   if (! allocmem_ptr)
     {
       errno = EFAULT;
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
+      return _dosexterr (&errorinfo);
     }
   assert (allocmem.address == (*allocmem_ptr)->address);
   allocmem.address = mremap (allocmem.address,

@@ -38,18 +38,10 @@ free_paragraphs
   struct _DOSERROR errorinfo = {0};
   uintptr_t free_pages = sysconf (_SC_AVPHYS_PAGES);
   if (free_pages == -1)
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   uintptr_t page_size = sysconf (_SC_PAGESIZE);
   if (page_size == -1)
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   *count = (free_pages * page_size) / 16;
   return 0;
 }
@@ -62,8 +54,7 @@ _dosk__allocmem_error
   struct _DOSERROR errorinfo = {0};
   unsigned err = free_paragraphs (count);
   if (err) return err;
-  _dosexterr (&errorinfo);
-  return errorinfo.exterror;
+  return _dosexterr (&errorinfo);
 }
 
 int

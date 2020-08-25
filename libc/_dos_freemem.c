@@ -44,8 +44,7 @@ _dos_freemem
   if (! allocmem_ptr)
     {
       errno = EFAULT;
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
+      return _dosexterr (&errorinfo);
     }
   assert (allocmem.address == (*allocmem_ptr)->address);
   if (munmap (allocmem.address,
@@ -55,9 +54,7 @@ _dos_freemem
       errorinfo.errclass = ERRCLASS_INTERN_SYS_ERROR;
       errorinfo.action = ERRACT_IMMEDIATE_ABORT;
       errorinfo.locus = ERRLOCUS_MEM_RELATED;
-      __doskexterr_set (&errorinfo);
-      errno = EINVAL;
-      return errorinfo.exterror;
+      return __doskexterr_set (&errorinfo, EINVAL);
     }
   void *pnode = tdelete (&allocmem,
 			 &_dosk__allocmem_tree,

@@ -20,8 +20,6 @@
 #ifndef _INC__DOSK_WRITE_STDOUT
 #define _INC__DOSK_WRITE_STDOUT
 
-#include "cpu.h"
-
 unsigned
 _dosk_write_stdout
 (const char *string);

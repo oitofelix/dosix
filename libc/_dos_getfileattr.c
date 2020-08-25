@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "INT.h"
-#include "cpu.h"
 #include "include/dos.h"
 
 unsigned
@@ -33,11 +32,7 @@ _dos_getfileattr
   struct _DOSERROR errorinfo = {0};
   struct stat fs;
   if (stat (path, &fs))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   unsigned _attrib = 0;
   if (S_ISDIR (fs.st_mode))
     _attrib = _A_SUBDIR;
@@ -53,8 +48,7 @@ _dos_getfileattr
 	    break;
 	  case ENOENT:
 	  default:
-	    _dosexterr (&errorinfo);
-	    return errorinfo.exterror;
+	    return _dosexterr (&errorinfo);
 	  }
     }
   *attrib = _attrib;

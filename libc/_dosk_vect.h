@@ -1,5 +1,5 @@
 /*
-  syscall_t.h -- syscall_t type
+  _dosk_vect.h -- Interrupt vector table
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_SYSCALL_T
-#define _INC_SYSCALL_T
+#ifndef _INC__DOSK_VECT
+#define _INC__DOSK_VECT
 
-#include "cpu.h"
+#include "include/dos.h"
 
-typedef
-void
-(*syscall_t)
-(cpu_t *);
+extern syscall_t _dosk_vect[UINT8_MAX];
 
 #endif

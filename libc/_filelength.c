@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _filelength.c -- Return length of file associated with handle
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,20 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
+#include <sys/stat.h>
+#include "_dosexterr.h"
 
-#include "include/dos.h"
-
-void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
-
-#endif
+off_t
+_filelength
+(int handle)
+{
+  struct _DOSERROR errorinfo = {0};
+  struct stat fs;
+  if (fstat (handle, &fs))
+    {
+      /* TODO? better error handling */
+      _dosexterr (&errorinfo);
+      return -1;
+    }
+  return fs.st_size;
+}

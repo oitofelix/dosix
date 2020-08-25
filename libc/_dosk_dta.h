@@ -1,5 +1,5 @@
 /*
-  dta.h -- Disk Transfer Area (DOS 1+)
+  _dosk_dta.h -- Disk Transfer Area (DOS 1+)
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DTA
-#define _INC_DTA
+#ifndef _INC__DOSK_DTA
+#define _INC__DOSK_DTA
 
 #include "include/dos.h"
 

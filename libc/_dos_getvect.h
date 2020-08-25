@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _dos_getvect.h -- Get interrupt vector (DOS 2+)
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
-
-#include "include/dos.h"
+#ifndef _INC__DOS_GETVECT
+#define _INC__DOS_GETVECT
 
 void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
+_dosk86_getvect
+(cpu_t *cpu);
 
 #endif

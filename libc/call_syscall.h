@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  call_syscall.h -- Call system calls
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
+#ifndef _INC_CALL_SYSCALL
+#define _INC_CALL_SYSCALL
 
 #include "include/dos.h"
 
 void
-interrupt
+call_syscall
 (uint8_t intnum,
- cpu_t *cpu);
+ cpu_t *cpu,
+ syscall_t syscall);
 
 #endif

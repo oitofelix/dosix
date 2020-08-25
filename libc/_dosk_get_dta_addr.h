@@ -20,8 +20,6 @@
 #ifndef _INC__DOSK_GET_DTA_ADDR
 #define _INC__DOSK_GET_DTA_ADDR
 
-#include "cpu.h"
-
 union dta_t *
 _dosk_get_dta_addr
 (void);

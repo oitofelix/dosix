@@ -79,8 +79,7 @@ _dosk_findnext
   errorinfo.errclass = ERRCLASS_NOT_FOUND;
   errorinfo.action = ERRACT_IGNORE;
   errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-  __doskexterr_set (&errorinfo);
-  return errorinfo.exterror;
+  return __doskexterr_set (&errorinfo, 0);
 }
 
 void

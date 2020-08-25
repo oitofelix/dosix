@@ -1,5 +1,5 @@
 /*
-  cpu.h -- 8086 CPU registers
+  _putch.c -- Write a single character to the console
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,37 +17,34 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_CPU
-#define _INC_CPU
+#define _GNU_SOURCE
+#include <assert.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
+#include "INT.h"
+#include "include/dos.h"
 
-#include <stdint.h>
-
-typedef struct cpu_word
+int
+_putch
+(int c)
 {
-  uintmax_t ax, bx, cx, dx;
-  uintmax_t si, di, bp, sp;
-  uintmax_t ip;
-  uintmax_t cs, ds, es, ss;
-  uintmax_t flags;
-} cpu_word_t;
+  char ch = c;
+  ssize_t count = 0;
+  while (count >= 0 && count < sizeof (ch))
+    count = TEMP_FAILURE_RETRY (write (STDOUT_FILENO,
+				       &ch,
+				       sizeof (ch)));
+  return count < 0
+    ? EOF
+    : c;
+}
 
-typedef struct cpu_byte
+void
+_dosk86_putch
+(cpu_t *cpu)
 {
-  uintmax_t al : 1 * 8;
-  uintmax_t ah : (sizeof (uintmax_t) - 1) * 8;
-  uintmax_t bl : 1 * 8;
-  uintmax_t bh : (sizeof (uintmax_t) - 1) * 8;
-  uintmax_t cl : 1 * 8;
-  uintmax_t ch : (sizeof (uintmax_t) - 1) * 8;
-  uintmax_t dl : 1 * 8;
-  uintmax_t dh : (sizeof (uintmax_t) - 1) * 8;
-} cpu_byte_t;
-
-typedef union cpu
-{
-  cpu_word_t r;
-  cpu_byte_t l;
-  cpu_byte_t h;
-} cpu_t;
-
-#endif
+  assert (cpu);
+  assert (cpu->h.ah == INT21_AH_PUTCH);
+  cpu->l.al = _putch (cpu->l.dl);
+}

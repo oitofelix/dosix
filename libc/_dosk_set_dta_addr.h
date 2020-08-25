@@ -21,7 +21,6 @@
 #define _INC__DOSK_SET_DTA_ADDR
 
 #include "_dosk_dta.h"
-#include "cpu.h"
 
 void
 _dosk_set_dta_addr

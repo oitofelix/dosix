@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  _dosk_int21_main_dos_api.h -- Int 21 handler; main DOS API
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
+#ifndef _INC__DOSK_INT21_MAIN_DOS_API
+#define _INC__DOSK_INT21_MAIN_DOS_API
 
 #include "include/dos.h"
 
 void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
+_dosk_int21_main_dos_api
+(cpu_t *cpu);
 
 #endif

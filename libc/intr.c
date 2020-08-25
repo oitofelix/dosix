@@ -1,5 +1,5 @@
 /*
-  interrupt.h -- Execute 8086 interrupt passing all registers
+  intr.c -- Execute 8086 interrupt; intr interface
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,14 +17,31 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_INTERRUPT
-#define _INC_INTERRUPT
-
+#include "interrupt.h"
 #include "include/dos.h"
 
 void
-interrupt
-(uint8_t intnum,
- cpu_t *cpu);
-
-#endif
+intr
+(int intnum,
+ union REGPACK *regs)
+{
+  cpu_t cpu = {0};
+  if (regs)
+    cpu = (cpu_t)
+      {
+       .r =
+       {
+	.ax = regs->x.ax,
+	.bx = regs->x.bx,
+	.cx = regs->x.cx,
+	.dx = regs->x.dx,
+	.bp = regs->x.bp,
+	.si = regs->x.si,
+	.di = regs->x.di,
+	.ds = regs->x.ds,
+	.es = regs->x.es,
+	.flags = regs->x.flags
+       }
+      };
+  interrupt (intnum, &cpu);
+}

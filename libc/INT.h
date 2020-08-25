@@ -27,13 +27,18 @@
 
 /* Sub-functions */
 
+#define INT21_AH_GETCHE 0x01
+#define INT21_AH_PUTCH 0x02
+#define INT21_AH_GETCH 0x08
 #define INT21_AH_WRITE_STDOUT 0x09
 #define INT21_AH_SET_DTA_ADDR 0x1a
+#define INT21_AH_SETVECT 0x25
 #define INT21_AH_GETDATE 0x2a
 #define INT21_AH_SETDATE 0x2b
 #define INT21_AH_GETTIME 0x2c
 #define INT21_AH_SETTIME 0x2d
 #define INT21_AH_GET_DTA_ADDR 0x2f
+#define INT21_AH_GETVECT 0x35
 #define INT21_AH_OPEN 0x3d
 #define INT21_AH_CLOSE 0x3e
 #define INT21_AH_ALLOCMEM 0x48

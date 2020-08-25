@@ -37,11 +37,7 @@ _dos_setftime
   if (err) return err;
   struct stat fs;
   if (fstat (handle, &fs))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   struct timeval tvp[2] =
     {
      {
@@ -54,11 +50,7 @@ _dos_setftime
      }
     };
   if (futimes (handle, tvp))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 

@@ -36,11 +36,7 @@ _dos_setdate
   unsigned err = __unixtime_struct (date, &time, &tv);
   if (err) return err;
   if (settimeofday (&tv, NULL))
-    {
-      /* TODO? better error handling */
-      _dosexterr (&errorinfo);
-      return errorinfo.exterror;
-    }
+    return _dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 
