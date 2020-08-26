@@ -41,6 +41,7 @@
 #include "_dos_settime.h"
 #include "_dos_setvect.h"
 #include "_dos_getvect.h"
+#include "_dos_creat.h"
 #include "_getch.h"
 #include "_putch.h"
 #include "_dosexterr.h"
@@ -108,11 +109,14 @@ _dosk_int21_main_dos_api
     case INT21_AH_GET_DTA_ADDR: /* 0x2f */
       syscall = _dosk86_get_dta_addr;
       break;
-    case INT21_AH_OPEN:	/* 0x3d */
-      syscall = _dosk86_open;
-      break;
     case INT21_AH_GETVECT: /* 0x35 */
       syscall = _dosk86_getvect;
+      break;
+    case INT21_AH_CREAT: /* 0x3c */
+      syscall = _dosk86_creat;
+      break;
+    case INT21_AH_OPEN:	/* 0x3d */
+      syscall = _dosk86_open;
       break;
     case INT21_AH_CLOSE: /* 0x3e */
       syscall = _dosk86_close;
@@ -144,6 +148,9 @@ _dosk_int21_main_dos_api
 	    }
 	  break;
 	}
+      break;
+    case INT21_AH_CREATNEW: /* 0x5b */
+      syscall = _dosk86_creatnew;
       break;
     }
   call_syscall (INT21_MAIN_DOS_API,

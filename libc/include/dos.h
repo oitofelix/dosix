@@ -211,9 +211,16 @@ _dos_findfirst
  unsigned attrib,
  struct _find_t *fileinfo);
 
+#define dos_findfirst _dos_findfirst
+
 unsigned
 _dos_findnext
 (struct _find_t *fileinfo);
+
+#define dos_findnext _dos_findnext
+
+#define _dos_findclose(fileinfo)
+#define dos_findclose _dos_findclose
 
 /*** dosexterr ***/
 struct _DOSERROR
@@ -329,6 +336,22 @@ _dos_open
  int *handle);
 
 #define dos_open _dos_open
+
+unsigned
+_dos_creat
+(const char* filename,
+ unsigned attrib,
+ int *handle);
+
+#define dos_creat _dos_creat
+
+unsigned
+_dos_creatnew
+(const char* filename,
+ unsigned attrib,
+ int *handle);
+
+#define dos_creatnew _dos_creatnew
 
 unsigned
 _dos_close

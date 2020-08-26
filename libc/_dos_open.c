@@ -75,8 +75,7 @@ _dosk86_open
 
      CL = attribute mask of files to look for (server call only)
 
-     What should we do about it?  Now it’s simply ignored.
- */
+     What should we do about it?  Now it’s simply ignored. */
   int handle;
   cpu->r.ax = _dos_open (_MK_FP (cpu->r.ds, cpu->r.dx),
 			 cpu->l.al,
