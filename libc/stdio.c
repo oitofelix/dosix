@@ -1,5 +1,5 @@
 /*
-  share.h -- File sharing modes
+  stdio.c -- Standard input/output
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,31 +17,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_SHARE
-#define _INC_SHARE
+#define _DOSIX_LIBC_SRC
+#define _GNU_SOURCE
 
-#include <dos/compiler.h>
+
+/* headers */
+#include <stdarg.h>
+#include <stdio.h>
+#include <dos/stdio.h>
 
-#define _SH_COMPAT 0x00 /* compatibility mode */
-#define _SH_CMPAT _SH_CMPAT /* documented alias (typo?) */
-#define _SH_DENYRW 0x10 /* deny read/write mode */
-#define _SH_DENYWR 0x20 /* deny write mode */
-#define _SH_DENYRD 0x30 /* deny read mode */
-#define _SH_DENYNO 0x40 /* deny none mode */
-
-#define SH_COMPAT _SH_COMPAT
-#define SH_CMPAT _SH_CMPAT
-#define SH_DENYRW _SH_DENYRW
-#define SH_DENYWR _SH_DENYWR
-#define SH_DENYRD _SH_DENYRD
-#define SH_DENYNO _SH_DENYNO
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
+
+/* printf */
+int
+_dosix_printf
+(const char *format,
+ ...)
+{
+  va_list ap;
+  va_start (ap, format);
+  return vprintf (format,
+		  ap);
 }
-#endif
-
-#endif

@@ -3,7 +3,7 @@
  * attributes back to normal.
  */
 
-#include <stdio.h>
+#include <dos/stdio.h>
 #include <dos.h>
 
 void main( void )

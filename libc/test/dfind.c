@@ -2,7 +2,7 @@
  * directory with the .c extension.
  */
 
-#include <stdio.h>
+#include <dos/stdio.h>
 #include <dos.h>
 
 void main( void )

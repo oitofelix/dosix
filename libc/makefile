@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 .PHONY = clean
+CPPFLAGS = -Iinclude
 CFLAGS = -ggdb3
 ARFLAGS = rvU
 srcs := $(wildcard *.c)

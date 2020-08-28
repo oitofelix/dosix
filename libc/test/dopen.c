@@ -2,8 +2,8 @@
  * file.
  */
 
-#include <_fcntl.h>
-#include <stdio.h>
+#include <dosix_fcntl.h>
+#include <dosix_stdio.h>
 #include <dos.h>
 
 void main( void )

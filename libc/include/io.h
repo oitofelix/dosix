@@ -20,15 +20,16 @@
 #ifndef _INC_IO
 #define _INC_IO
 
-#include <fcntl.h>
-#include <unistd.h>
-
-#define _open open
-
-off_t
-_filelength
-(int handle);
+#include <dos/compiler.h>
 
 #define filelength _filelength
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  off_t __cdecl _filelength (int);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,5 +1,5 @@
 /*
-  share.h -- File sharing modes
+  _stdlib.h -- Commonly used library features
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,31 +17,37 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_SHARE
-#define _INC_SHARE
+#ifndef _INC__STDLIB
+#define _INC__STDLIB
 
-#include <dos/compiler.h>
+#include <dos/stdlib.h>
 
-#define _SH_COMPAT 0x00 /* compatibility mode */
-#define _SH_CMPAT _SH_CMPAT /* documented alias (typo?) */
-#define _SH_DENYRW 0x10 /* deny read/write mode */
-#define _SH_DENYWR 0x20 /* deny write mode */
-#define _SH_DENYRD 0x30 /* deny read mode */
-#define _SH_DENYNO 0x40 /* deny none mode */
+#define EXIT_CLEANUP_STACK_SIZE 32
 
-#define SH_COMPAT _SH_COMPAT
-#define SH_CMPAT _SH_CMPAT
-#define SH_DENYRW _SH_DENYRW
-#define SH_DENYWR _SH_DENYWR
-#define SH_DENYRD _SH_DENYRD
-#define SH_DENYNO _SH_DENYNO
+typedef struct exit_cleanup_entry
+{
+  union
+  {
+    void (__cdecl *_atexit) (void);
+    void (__cdecl __far *_fatexit) (void);
+    _onexit_t _onexit;
+    _fonexit_t _fonexit;
+  } func;
+  enum
+    {
+     _ATEXIT_FUNC,
+     _FATEXIT_FUNC,
+     _ONEXIT_FUNC,
+     _FONEXIT_FUNC
+    } type;
+} exit_cleanup_entry_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern
+exit_cleanup_entry_t
+_dosix__exit_cleanup_stack[EXIT_CLEANUP_STACK_SIZE];
 
-#ifdef __cplusplus
-}
-#endif
+extern
+size_t
+_dosix__exit_cleanup_stack_top;
 
 #endif

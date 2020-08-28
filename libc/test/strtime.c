@@ -1,7 +1,7 @@
 /* STRTIME.C */
 
-#include <_time.h>
-#include <stdio.h>
+#include <dos/time.h>
+#include <dos/stdio.h>
 
 void main( void )
 {

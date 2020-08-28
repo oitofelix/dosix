@@ -1,5 +1,5 @@
 /*
-  conio.h -- console and port I/O declarations
+  conio.h -- Console and port I/O
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -20,28 +20,22 @@
 #ifndef _INC_CONIO
 #define _INC_CONIO
 
-int
-_cputs
-(const char *string);
+#include <dos/compiler.h>
 
 #define cputs _cputs
-
-int
-_getch
-(void);
-
 #define getch _getch
-
-int
-_getche
-(void);
-
 #define getche _getche
-
-int
-_putch
-(int c);
-
 #define putch _putch
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  int __cdecl _cputs (const char *);
+  int __cdecl _getch (void);
+  int __cdecl _getche (void);
+  int __cdecl _putch (int);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

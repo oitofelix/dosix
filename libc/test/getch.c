@@ -3,7 +3,7 @@
  */
 
 #include <conio.h>
-#include <ctype.h>
+#include <dosix_ctype.h>
 
 void main( void )
 {

@@ -2,9 +2,9 @@
  * fields of a file.
  */
 
-#include <_fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <dosix_fcntl.h>
+#include <dosix_stdio.h>
+#include <dosix_stdlib.h>
 #include <dos.h>
 
 void main( void )

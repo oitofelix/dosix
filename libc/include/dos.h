@@ -1,5 +1,5 @@
 /*
-  dos.h -- DOS C library
+  dos.h -- DOS interface routines
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -24,10 +24,79 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <glob.h>
+#include <dos/compiler.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define _MK_FP(seg,offset) ((void *) ((((uintptr_t) (seg)) & 0) | (uintptr_t) (offset)))
+#define _FP_SEG(address) ((uintptr_t) 0)
+#define _FP_OFF(address) ((uintptr_t) (address))
+
+/* File attributes */
+#define _A_NORMAL 0x00
+#define _A_RDONLY 0x01
+#define _A_HIDDEN 0x02
+#define _A_SYSTEM 0x04
+#define _A_VOLID 0x08
+#define _A_EXEC 0x08 /* Novell NetWare */
+#define _A_SUBDIR 0x10
+#define _A_ARCH 0x20
+#define _A_UNUSED 0x40
+#define _A_DELETED 0x80 /* Novell DOS / OpenDOS */
+#define _A_SHAREABLE 0x80 /* Novell NetWare */
+
+#define WORDREGS _WORDREGS
+#define BYTEREGS _BYTEREGS
+#define REGS _REGS
+#define SREGS _SREGS
+#define MK_FP _MK_FP
+#define FP_SEG _FP_SEG
+#define FP_OFF _FP_OFF
+
+#define find_t _find_t
+#define dosdate_t _dosdate_t
+#define dostime_t _dostime_t
+
+#define dos_findfirst _dos_findfirst
+#define dos_findnext _dos_findnext
+#define dos_findclose _dos_findclose
+#define dos_getfileattr _dos_getfileattr
+#define dos_setfileattr _dos_setfileattr
+#define dos_open _dos_open
+#define dos_creat _dos_creat
+#define dos_creatnew _dos_creatnew
+#define dos_close _dos_close
+#define dos_getftime _dos_getftime
+#define dos_setftime _dos_setftime
+#define dos_allocmem _dos_allocmem
+#define dos_setblock _dos_setblock
+#define dos_freemem _dos_freemem
+#define dos_getdate _dos_getdate
+#define dos_gettime _dos_gettime
+#define dos_settime _dos_settime
+#define dos_setdate _dos_setdate
+
+#define intdosx _intdosx
+#define intdos _intdos
+#define int86x _int86x
+#define int86 _int86
+#define bdos _bdos
+
+#define _dos_findclose(fileinfo)
+#define intrpt(intnum,regs)			\
+  intr (intnum, (union REGPACK *) regs)
+
+/* Unofficial portability aid (supposedly) */
+
+/* #define MAXDRIVE _MAX_DRIVE */
+/* #define MAXPATH _MAX_PATH */
+/* #define MAXDIR _MAX_DIR */
+/* #define MAXFILE _MAX_FNAME */
+/* #define MAXEXT _MAX_EXT */
+
+/* #define WILDCARDS 0x01 */
+/* #define EXTENSION 0x02 */
+/* #define FILENAME  0x04 */
+/* #define DIRECTORY 0x08 */
+/* #define DRIVE     0x10 */
 
 /*** CPU ***/
 typedef struct cpu_word
@@ -100,11 +169,6 @@ typedef struct _SREGS
   uintmax_t ds;
 } _SREGS;
 
-#define WORDREGS _WORDREGS
-#define BYTEREGS _BYTEREGS
-#define REGS _REGS
-#define SREGS _SREGS
-
 typedef struct
 {
   uintmax_t r_ax, r_bx, r_cx, r_dx;
@@ -135,94 +199,52 @@ union REGPACK
   } x;
 };
 
-/*** Pointer macros  ***/
-
-/* Make a far pointer */
-#define _MK_FP(seg,offset) ((void *) ((((uintptr_t) (seg)) & 0) | (uintptr_t) (offset)))
-/* Return segment of far pointer */
-#define _FP_SEG(address) ((uintptr_t) 0)
-/* Return offset of far pointer */
-#define _FP_OFF(address) ((uintptr_t) (address))
-
-#define MK_FP _MK_FP
-#define FP_SEG _FP_SEG
-#define FP_OFF _FP_OFF
-
-/*** DOS find functions ***/
-
 struct _find_t
-  {
-    /* Private */
-    char *_filename;		/* Search template */
-    unsigned _attrib;		/* Search attribute */
-    glob_t _glob; 		/* Directory stream */
-    size_t _gl_pathi;		/* Current index in _glob.gl_path */
+{
+  /* Private */
+  char *_filename;		/* Search template */
+  unsigned _attrib;		/* Search attribute */
+  glob_t _glob; 		/* Directory stream */
+  size_t _gl_pathi;		/* Current index in _glob.gl_path */
 
-    /* Public */
-    unsigned attrib;		/* Attribute set for matched path */
-    /*
-      For the time format the listed bits have the given contents:
+  /* Public */
+  unsigned attrib;		/* Attribute set for matched path */
+  /*
+    For the time format the listed bits have the given contents:
 
-      - 00--04: Number of 2-second increments (0--29)
-      - 05--10: Minutes (0--59)
-      - 11--15: Hours (0--23)
+    - 00--04: Number of 2-second increments (0--29)
+    - 05--10: Minutes (0--59)
+    - 11--15: Hours (0--23)
 
-      This element is in DOS format and is not usable by any other C
-      run-time function.
-    */
-    unsigned wr_time;		/* Time of last write operation to
+    This element is in DOS format and is not usable by any other C
+    run-time function.
+  */
+  unsigned wr_time;		/* Time of last write operation to
 				   file */
-    /*
-      For the date format the listed bits have the given contents:
+  /*
+    For the date format the listed bits have the given contents:
 
-      - 00--04: Day of month (1--31)
-      - 05--08: Month (1--12)
-      - 09--15: Year (relative to 1980)
+    - 00--04: Day of month (1--31)
+    - 05--08: Month (1--12)
+    - 09--15: Year (relative to 1980)
 
-      This element is in DOS format and is not usable by any other C
-      run-time function.
-    */
-    unsigned wr_date;		/* Date of last write operation to
+    This element is in DOS format and is not usable by any other C
+    run-time function.
+  */
+  unsigned wr_date;		/* Date of last write operation to
 				   file */
-    off_t size;			/* Length of file in bytes */
-    char name[NAME_MAX];		/* Null-terminated name of matched
-					   file or directory, without the
-					   path */
+  off_t size;			/* Length of file in bytes */
+  char name[NAME_MAX];		/* Null-terminated name of matched
+				   file or directory, without the
+				   path */
 };
 
-#define find_t _find_t
+/* REMOVE-ME? */
+typedef struct fblock
+{
+  struct _find_t ff;
+} FBLOCK;
 
-/* File attributes */
-#define _A_NORMAL 0x00
-#define _A_RDONLY 0x01
-#define _A_HIDDEN 0x02
-#define _A_SYSTEM 0x04
-#define _A_VOLID 0x08
-#define _A_EXEC 0x08		/* Novell NetWare */
-#define _A_SUBDIR 0x10
-#define _A_ARCH 0x20
-#define _A_UNUSED 0x40
-#define _A_DELETED 0x80		/* Novell DOS / OpenDOS */
-#define _A_SHAREABLE 0x80	/* Novell NetWare */
-
-unsigned
-_dos_findfirst
-(const char *filename,
- unsigned attrib,
- struct _find_t *fileinfo);
-
-#define dos_findfirst _dos_findfirst
-
-unsigned
-_dos_findnext
-(struct _find_t *fileinfo);
-
-#define dos_findnext _dos_findnext
-
-#define _dos_findclose(fileinfo)
-#define dos_findclose _dos_findclose
-
-/*** dosexterr ***/
 struct _DOSERROR
 {
   int exterror;
@@ -239,235 +261,54 @@ struct DOSERROR
   char action;
   char locus;
 };
-
-int
-dosexterr
-(struct DOSERROR *);
-
-int
-_dosexterr
-(struct _DOSERROR *);
-
-/*** date and time ***/
+#endif
 
 struct _dosdate_t
 {
-  unsigned char day;		/* 01--31 */
-  unsigned char month;		/* 01--12 */
-  unsigned int year;		/* 1980--2099 */
-  unsigned char dayofweek;	/* 0--6, 0=Sunday */
+  unsigned char day; /* 01--31 */
+  unsigned char month; /* 01--12 */
+  unsigned int year; /* 1980--2099 */
+  unsigned char dayofweek; /* 0--6, 0=Sunday */
 };
 
 struct _dostime_t
 {
-  unsigned char hour;		/* 0--23 */
-  unsigned char minute;		/* 0--59 */
-  unsigned char second;		/* 0--59 */
-  unsigned char hsecond;	/* 0--99 */
+  unsigned char hour; /* 0--23 */
+  unsigned char minute; /* 0--59 */
+  unsigned char second; /* 0--59 */
+  unsigned char hsecond; /* 0--99 */
 };
 
-#define dosdate_t _dosdate_t
-#define dostime_t _dostime_t
-
-int
-_int86x
-(int intnum,
- union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
-
-#define int86x _int86x
-
-int
-_int86
-(int intnum,
- union _REGS *inregs,
- union _REGS *outregs);
-
-#define int86 _int86
-
-int
-_intdosx
-(union _REGS *inregs,
- union _REGS *outregs,
- struct _SREGS *segregs);
-
-#define intdosx _intdosx
-
-int
-_intdos
-(union _REGS *inregs,
- union _REGS *outregs);
-
-#define intdos _intdos
-
-void intr
-(int intnum,
- union REGPACK *regs);
-
-#define intrpt(intnum,regs) intr((intnum), (union REGPACK*) (regs))
-
-int
-_bdos
-(int dosfunc,
- unsigned int dosdx,
- unsigned int dosal);
-
-#define bdos _bdos
-
-unsigned
-_dos_getfileattr
-(const char *path,
- unsigned *attrib);
-
-#define dos_getfileattr _dos_getfileattr
-
-unsigned
-_dos_setfileattr
-(const char *path,
- unsigned attrib);
-
-#define dos_setfileattr _dos_setfileattr
-
-unsigned
-_dos_open
-(const char *path,
- unsigned mode,
- int *handle);
-
-#define dos_open _dos_open
-
-unsigned
-_dos_creat
-(const char* filename,
- unsigned attrib,
- int *handle);
-
-#define dos_creat _dos_creat
-
-unsigned
-_dos_creatnew
-(const char* filename,
- unsigned attrib,
- int *handle);
-
-#define dos_creatnew _dos_creatnew
-
-unsigned
-_dos_close
-(int handle);
-
-#define dos_close _dos_close
-
-unsigned
-_dos_getftime
-(int handle,
- unsigned *date,
- unsigned *time);
-
-#define dos_getftime _dos_getftime
-
-unsigned
-_dos_setftime
-(int handle,
- unsigned date,
- unsigned time);
-
-#define dos_setftime _dos_setftime
-
-unsigned
-_dos_allocmem
-(size_t size,
- uintptr_t *seg);
-
-#define dos_allocmem _dos_allocmem
-
-unsigned
-_dos_setblock
-(size_t size,
- uintptr_t seg,
- size_t *maxsize);
-
-#define dos_setblock _dos_setblock
-
-unsigned
-_dos_freemem
-(uintptr_t seg);
-
-#define dos_freemem _dos_freemem
-
-void
-_dos_getdate
-(struct _dosdate_t *date);
-
-#define dos_getdate _dos_getdate
-
-void
-_dos_gettime
-(struct _dostime_t *time);
-
-#define dos_gettime _dos_gettime
-
-unsigned
-_dos_settime
-(struct _dostime_t *time);
-
-#define dos_settime _dos_settime
-
-unsigned
-_dos_setdate
-(struct _dosdate_t *date);
-
-#define dos_setdate _dos_setdate
-
-void
-_dos_setvect
-(unsigned intnum,
- syscall_t syscall);
-
-syscall_t
-_dos_getvect
-(unsigned intnum);
-
+#ifdef __cplusplus
+extern "C" {
 #endif
-
-/* Fixes */
-
-#define __far
-#define _far __far
-#define far _far
-#define __near
-#define _near __near
-#define near _near
-#define __cdecl
-#define _cdecl __cdecl
-#define cdecl _cdecl
-
-/* Unofficial portability aid (supposedly) */
-
-#define _MAX_DRIVE 3		  /* max. length of drive component */
-#define _MAX_PATH (PATH_MAX + 1)  /* max. length of full pathname */
-#define _MAX_DIR (PATH_MAX + 1)   /* max. length of path component */
-#define _MAX_FNAME (NAME_MAX + 1) /* max. length of file name component */
-#define _MAX_EXT (NAME_MAX + 1)	  /* max. length of extension component */
-
-#define MAXDRIVE _MAX_DRIVE
-#define MAXPATH _MAX_PATH
-#define MAXDIR _MAX_DIR
-#define MAXFILE _MAX_FNAME
-#define MAXEXT _MAX_EXT
-
-#define WILDCARDS 0x01
-#define EXTENSION 0x02
-#define FILENAME  0x04
-#define DIRECTORY 0x08
-#define DRIVE     0x10
-
-typedef struct fblock
-{
-  struct _find_t ff;
-} FBLOCK;
-
+  unsigned __cdecl _dos_findfirst (const char *, unsigned, struct _find_t *);
+  unsigned __cdecl _dos_findnext (struct _find_t *);
+  int __cdecl dosexterr (struct DOSERROR *);
+  int __cdecl _dosexterr (struct _DOSERROR *);
+  int __cdecl _int86x (int, union _REGS *, union _REGS *, struct _SREGS *);
+  int __cdecl _int86 (int, union _REGS *, union _REGS *);
+  int __cdecl _intdosx (union _REGS *, union _REGS *, struct _SREGS *);
+  int __cdecl _intdos (union _REGS *, union _REGS *);
+  void __cdecl intr (int, union REGPACK *);
+  int __cdecl _bdos (int, unsigned int, unsigned int);
+  unsigned __cdecl _dos_getfileattr (const char *, unsigned *);
+  unsigned __cdecl _dos_setfileattr (const char *, unsigned );
+  unsigned __cdecl _dos_open (const char *, unsigned, int *);
+  unsigned __cdecl _dos_creat (const char *, unsigned, int *);
+  unsigned __cdecl  _dos_creatnew (const char *, unsigned, int *);
+  unsigned __cdecl _dos_close (int);
+  unsigned __cdecl _dos_getftime (int, unsigned *, unsigned *);
+  unsigned __cdecl _dos_setftime (int, unsigned, unsigned);
+  unsigned __cdecl _dos_allocmem (size_t, uintptr_t *);
+  unsigned __cdecl _dos_setblock (size_t, uintptr_t, size_t *);
+  unsigned __cdecl _dos_freemem (uintptr_t);
+  void __cdecl _dos_getdate (struct _dosdate_t *);
+  void __cdecl _dos_gettime (struct _dostime_t *);
+  unsigned __cdecl _dos_settime (struct _dostime_t *);
+  unsigned __cdecl _dos_setdate (struct _dosdate_t *);
+  void __cdecl _dos_setvect (unsigned, syscall_t);
+  syscall_t __cdecl _dos_getvect (unsigned);
 #ifdef __cplusplus
 }
 #endif

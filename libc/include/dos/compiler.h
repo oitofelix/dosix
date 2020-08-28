@@ -1,5 +1,5 @@
 /*
-  share.h -- File sharing modes
+  compiler.h -- Compiler compatibility macros
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,31 +17,26 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_SHARE
-#define _INC_SHARE
+#ifndef _INC_COMPILER
+#define _INC_COMPILER
 
-#include <dos/compiler.h>
-
-#define _SH_COMPAT 0x00 /* compatibility mode */
-#define _SH_CMPAT _SH_CMPAT /* documented alias (typo?) */
-#define _SH_DENYRW 0x10 /* deny read/write mode */
-#define _SH_DENYWR 0x20 /* deny write mode */
-#define _SH_DENYRD 0x30 /* deny read mode */
-#define _SH_DENYNO 0x40 /* deny none mode */
-
-#define SH_COMPAT _SH_COMPAT
-#define SH_CMPAT _SH_CMPAT
-#define SH_DENYRW _SH_DENYRW
-#define SH_DENYWR _SH_DENYWR
-#define SH_DENYRD _SH_DENYRD
-#define SH_DENYNO _SH_DENYNO
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
+#define __huge
+#define _huge __huge
+#define huge _huge
+#define __cdecl
+#define _cdecl __cdecl
+#define cdecl _cdecl
+#define __based(type)
+#define _based(type) __based(type)
+#define based(type) _based(type)
+#define __far
+#define _far __far
+#define far _far
+#define __near
+#define _near __near
+#define near _near
+#define __segment void *
+#define _segment __segment
+#define segment _segment
 
 #endif

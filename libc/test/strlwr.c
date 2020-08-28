@@ -2,8 +2,8 @@
  * uppercase and lowercase copies of a mixed-case string.
  */
 
-#include <_string.h>
-#include <stdio.h>
+#include <dos/string.h>
+#include <dos/stdio.h>
 #include <dos.h>
 
 void main( void )
