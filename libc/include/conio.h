@@ -20,22 +20,32 @@
 #ifndef _INC_CONIO
 #define _INC_CONIO
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
+#ifndef _DOSIX_LIBC_SRC
+#define _cputs _dosix__cputs
+#define _getch _dosix__getch
+#define _getche _dosix__getche
+#define _putch _dosix__putch
+
+#ifndef __STRICT_ANSI__
 #define cputs _cputs
 #define getch _getch
 #define getche _getche
 #define putch _putch
+#endif	/* ! __STRICT_ANSI__ */
+
+#endif	/* ! _DOSIX_LIBC_SRC */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  int __cdecl _cputs (const char *);
-  int __cdecl _getch (void);
-  int __cdecl _getche (void);
-  int __cdecl _putch (int);
+  int __cdecl _dosix__cputs (const char *);
+  int __cdecl _dosix__getch (void);
+  int __cdecl _dosix__getche (void);
+  int __cdecl _dosix__putch (int);
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	/* ! _INC_CONIO */

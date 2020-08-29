@@ -47,11 +47,8 @@ _dosix__exit
   _Exit (status);
 }
 
-
-/* _cexit functions */
-
 void
-_cexit
+_dosix__cexit
 (void)
 {
   while (_dosix__exit_cleanup_stack_top-- > 0)
@@ -78,13 +75,24 @@ _cexit
     }
   if (fflush (NULL))
     assert (true);		/* ignore errors */
-  _c_exit ();
+  _dosix__c_exit ();
 }
 
 void
-_c_exit
+_dosix__c_exit
 (void)
 {
   if (fcloseall ())
     assert (true);		/* ignore errors */
+}
+
+
+/* system */
+
+int
+_dosix_system
+(const char *command)
+{
+  /* FIX-ME: must rely on command.com! */
+  return system (command);
 }

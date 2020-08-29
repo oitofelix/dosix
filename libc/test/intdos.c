@@ -3,7 +3,7 @@
  */
 
 #include <dos.h>
-#include <dos/stdio.h>
+#include <dosix/stdio.h>
 
 void main( void )
 {

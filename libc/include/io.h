@@ -20,16 +20,23 @@
 #ifndef _INC_IO
 #define _INC_IO
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
-#define filelength _filelength
+#ifndef _DOSIX_LIBC_SRC
+#define _filelength _dosix__filelength
+
+#ifndef __STRICT_ANSI__
+#define filelength _dosix__filelength
+#endif	/* ! __STRICT_ANSI__ */
+
+#endif	/* ! _DOSIX_LIBC_SRC */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  off_t __cdecl _filelength (int);
+  off_t __cdecl _dosix__filelength (int);
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	/* ! _INC_IO */

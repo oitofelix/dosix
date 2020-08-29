@@ -24,37 +24,34 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <glob.h>
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
-#define _MK_FP(seg,offset) ((void *) ((((uintptr_t) (seg)) & 0) | (uintptr_t) (offset)))
-#define _FP_SEG(address) ((uintptr_t) 0)
-#define _FP_OFF(address) ((uintptr_t) (address))
+#ifndef _DOSIX_LIBC_SRC
+#define _dos_findfirst _dosix__dos_findfirst
+#define _dos_findnext _dosix__dos_findnext
+#define _dos_findclose _dosix__dos_findclose
+#define _dos_getfileattr _dosix__dos_getfileattr
+#define _dos_setfileattr _dosix__dos_setfileattr
+#define _dos_open _dosix__dos_open
+#define _dos_creat _dosix__dos_creat
+#define _dos_creatnew _dosix__dos_creatnew
+#define _dos_close _dosix__dos_close
+#define _dos_getftime _dosix__dos_getftime
+#define _dos_setftime _dosix__dos_setftime
+#define _dos_allocmem _dosix__dos_allocmem
+#define _dos_setblock _dosix__dos_setblock
+#define _dos_freemem _dosix__dos_freemem
+#define _dos_getdate _dosix__dos_getdate
+#define _dos_gettime _dosix__dos_gettime
+#define _dos_settime _dosix__dos_settime
+#define _dos_setdate _dosix__dos_setdate
+#define _intdosx _dosix__intdosx
+#define _intdos _dosix__intdos
+#define _int86x _dosix__int86x
+#define _int86 _dosix__int86
+#define _bdos _dosix__bdos
 
-/* File attributes */
-#define _A_NORMAL 0x00
-#define _A_RDONLY 0x01
-#define _A_HIDDEN 0x02
-#define _A_SYSTEM 0x04
-#define _A_VOLID 0x08
-#define _A_EXEC 0x08 /* Novell NetWare */
-#define _A_SUBDIR 0x10
-#define _A_ARCH 0x20
-#define _A_UNUSED 0x40
-#define _A_DELETED 0x80 /* Novell DOS / OpenDOS */
-#define _A_SHAREABLE 0x80 /* Novell NetWare */
-
-#define WORDREGS _WORDREGS
-#define BYTEREGS _BYTEREGS
-#define REGS _REGS
-#define SREGS _SREGS
-#define MK_FP _MK_FP
-#define FP_SEG _FP_SEG
-#define FP_OFF _FP_OFF
-
-#define find_t _find_t
-#define dosdate_t _dosdate_t
-#define dostime_t _dostime_t
-
+#ifndef __STRICT_ANSI__
 #define dos_findfirst _dos_findfirst
 #define dos_findnext _dos_findnext
 #define dos_findclose _dos_findclose
@@ -73,14 +70,47 @@
 #define dos_gettime _dos_gettime
 #define dos_settime _dos_settime
 #define dos_setdate _dos_setdate
-
 #define intdosx _intdosx
 #define intdos _intdos
 #define int86x _int86x
 #define int86 _int86
 #define bdos _bdos
 
-#define _dos_findclose(fileinfo)
+#define WORDREGS _WORDREGS
+#define BYTEREGS _BYTEREGS
+#define REGS _REGS
+#define SREGS _SREGS
+
+#define MK_FP _MK_FP
+#define FP_SEG _FP_SEG
+#define FP_OFF _FP_OFF
+
+#define find_t _find_t
+#define dosdate_t _dosdate_t
+#define dostime_t _dostime_t
+#define diskfree_t _diskfree_t
+#endif	/* ! __STRICT_ANSI__ */
+
+#endif	/* ! _DOS_LIBC_SRC */
+
+#define _MK_FP(seg,offset) ((void *) ((((uintptr_t) (seg)) & 0) | (uintptr_t) (offset)))
+#define _FP_SEG(address) ((uintptr_t) 0)
+#define _FP_OFF(address) ((uintptr_t) (address))
+
+/* File attributes */
+#define _A_NORMAL 0x00
+#define _A_RDONLY 0x01
+#define _A_HIDDEN 0x02
+#define _A_SYSTEM 0x04
+#define _A_VOLID 0x08
+#define _A_EXEC 0x08 /* Novell NetWare */
+#define _A_SUBDIR 0x10
+#define _A_ARCH 0x20
+#define _A_UNUSED 0x40
+#define _A_DELETED 0x80 /* Novell DOS / OpenDOS */
+#define _A_SHAREABLE 0x80 /* Novell NetWare */
+
+/* REMOVE-ME? */
 #define intrpt(intnum,regs)			\
   intr (intnum, (union REGPACK *) regs)
 
@@ -253,7 +283,7 @@ struct _DOSERROR
   char locus;
 };
 
-#if ! defined (__cplusplus)
+#if ! defined (__STRICT_ANSI__) && ! defined (__cplusplus)
 struct DOSERROR
 {
   int exterror;
@@ -282,34 +312,37 @@ struct _dostime_t
 #ifdef __cplusplus
 extern "C" {
 #endif
-  unsigned __cdecl _dos_findfirst (const char *, unsigned, struct _find_t *);
-  unsigned __cdecl _dos_findnext (struct _find_t *);
-  int __cdecl dosexterr (struct DOSERROR *);
-  int __cdecl _dosexterr (struct _DOSERROR *);
-  int __cdecl _int86x (int, union _REGS *, union _REGS *, struct _SREGS *);
-  int __cdecl _int86 (int, union _REGS *, union _REGS *);
-  int __cdecl _intdosx (union _REGS *, union _REGS *, struct _SREGS *);
-  int __cdecl _intdos (union _REGS *, union _REGS *);
-  void __cdecl intr (int, union REGPACK *);
-  int __cdecl _bdos (int, unsigned int, unsigned int);
-  unsigned __cdecl _dos_getfileattr (const char *, unsigned *);
-  unsigned __cdecl _dos_setfileattr (const char *, unsigned );
-  unsigned __cdecl _dos_open (const char *, unsigned, int *);
-  unsigned __cdecl _dos_creat (const char *, unsigned, int *);
-  unsigned __cdecl  _dos_creatnew (const char *, unsigned, int *);
-  unsigned __cdecl _dos_close (int);
-  unsigned __cdecl _dos_getftime (int, unsigned *, unsigned *);
-  unsigned __cdecl _dos_setftime (int, unsigned, unsigned);
-  unsigned __cdecl _dos_allocmem (size_t, uintptr_t *);
-  unsigned __cdecl _dos_setblock (size_t, uintptr_t, size_t *);
-  unsigned __cdecl _dos_freemem (uintptr_t);
-  void __cdecl _dos_getdate (struct _dosdate_t *);
-  void __cdecl _dos_gettime (struct _dostime_t *);
-  unsigned __cdecl _dos_settime (struct _dostime_t *);
-  unsigned __cdecl _dos_setdate (struct _dosdate_t *);
-  void __cdecl _dos_setvect (unsigned, syscall_t);
-  syscall_t __cdecl _dos_getvect (unsigned);
+  /* find functions */
+  unsigned __cdecl _dosix__dos_findfirst (const char *, unsigned, struct _find_t *);
+  unsigned __cdecl _dosix__dos_findnext (struct _find_t *);
+  void __cdecl _dosix__dos_findclose (struct _find_t *);
+  int __cdecl _dosix_dosexterr (struct DOSERROR *);
+  int __cdecl _dosix__dosexterr (struct _DOSERROR *);
+  int __cdecl _dosix__int86x (int, union _REGS *, union _REGS *, struct _SREGS *);
+  int __cdecl _dosix__int86 (int, union _REGS *, union _REGS *);
+  int __cdecl _dosix__intdosx (union _REGS *, union _REGS *, struct _SREGS *);
+  int __cdecl _dosix__intdos (union _REGS *, union _REGS *);
+  void __cdecl _dosix_intr (int, union REGPACK *);
+  int __cdecl _dosix__bdos (int, unsigned int, unsigned int);
+  unsigned __cdecl _dosix__dos_getfileattr (const char *, unsigned *);
+  unsigned __cdecl _dosix__dos_setfileattr (const char *, unsigned );
+  unsigned __cdecl _dosix__dos_open (const char *, unsigned, int *);
+  unsigned __cdecl _dosix__dos_creat (const char *, unsigned, int *);
+  unsigned __cdecl _dosix__dos_creatnew (const char *, unsigned, int *);
+  unsigned __cdecl _dosix__dos_close (int);
+  unsigned __cdecl _dosix__dos_getftime (int, unsigned *, unsigned *);
+  unsigned __cdecl _dosix__dos_setftime (int, unsigned, unsigned);
+  unsigned __cdecl _dosix__dos_allocmem (size_t, uintptr_t *);
+  unsigned __cdecl _dosix__dos_setblock (size_t, uintptr_t, size_t *);
+  unsigned __cdecl _dosix__dos_freemem (uintptr_t);
+  void __cdecl _dosix__dos_getdate (struct _dosdate_t *);
+  void __cdecl _dosix__dos_gettime (struct _dostime_t *);
+  unsigned __cdecl _dosix__dos_settime (struct _dostime_t *);
+  unsigned __cdecl _dosix__dos_setdate (struct _dosdate_t *);
+  void __cdecl _dosix__dos_setvect (unsigned, syscall_t);
+  syscall_t __cdecl _dosix__dos_getvect (unsigned);
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif	/* ! _INC_DOS */

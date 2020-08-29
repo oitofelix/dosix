@@ -6,9 +6,8 @@
  * _SREGS structure.
  */
 
-#include <dosix_signal.h>
 #include <dos.h>
-#include <dosix_stdio.h>
+#include <dosix/stdio.h>
 #include <process.h>
 
 char  far *filename = "int86x.c";

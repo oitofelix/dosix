@@ -3,7 +3,7 @@
  */
 
 #include <dos.h>
-#include <dosix_stdio.h>
+#include <dosix/stdio.h>
 
 char far *buffer = "Dollar-sign terminated string\n\r\n\r$";
 

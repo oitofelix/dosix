@@ -20,7 +20,7 @@
 #ifndef _INC_BIOS
 #define _INC_BIOS
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,4 +30,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif	/* ! _INC_BIOS */

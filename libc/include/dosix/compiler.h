@@ -1,5 +1,5 @@
 /*
-  time.h -- Date and time
+  compiler.h -- Compiler compatibility macros
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,18 +17,22 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_TIME
-#define _INC_TIME
+#ifndef _INC_DOS_COMPILER
+#define _INC_DOS_COMPILER
 
-#include <dos/compiler.h>
+#define __huge
+#define _huge __huge
+#define __cdecl
+#define _cdecl __cdecl
+#define __based(type)
+#define _based(type) __based(type)
+#define __far
+#define _far __far
+#define far _far
+#define __near
+#define _near __near
+#define near _near
+#define __segment void *
+#define _segment __segment
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-  char * __cdecl _strtime (char *timestr);
-  char * __cdecl _strdate (char *datestr);
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif	/* ! _INC_DOS_COMPILER */

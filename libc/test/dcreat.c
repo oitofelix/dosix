@@ -3,8 +3,8 @@
  * function because it already exists.
  */
 
-#include <dosix_stdio.h>
-#include <dosix_stdlib.h>
+#include <dosix/stdio.h>
+#include <dosix/stdlib.h>
 #include <dos.h>
 
 void main( void )

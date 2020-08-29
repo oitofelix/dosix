@@ -5,9 +5,9 @@
  * memory allocated to buffer.
  */
 
-#include <dosix_stdio.h>
-#include <dosix_malloc.h>
-#include <dosix_stdlib.h>
+#include <dosix/stdio.h>
+#include <dosix/malloc.h>
+#include <dosix/stdlib.h>
 void main( void )
 {
    long *buffer;

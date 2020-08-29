@@ -23,61 +23,155 @@
 
 /* headers */
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
-#include <dos/string.h>
+#include <dosix/malloc.h>
+#include <dosix/ctype.h>
+#include <dosix/string.h>
+
+
+/* strlen */
+size_t
+_dosix_strlen
+(const char *string)
+{
+  assert (string);
+  return strlen (string);
+}
+
+size_t
+_dosix__fstrlen
+(const char __far *string)
+{
+  assert (string);
+  return
+    _dosix_strlen ((const char *) string);
+}
 
 
 /* _strlwr functions */
 
 char *
-_strlwr
+_dosix__strlwr
 (char *string)
 {
-  size_t len = strlen (string);
+  assert (string);
+  size_t len = _dosix_strlen (string);
   for (size_t i = 0; i < len; i++)
-    string[i] = tolower (string[i]);
+    string[i] = _dosix_tolower (string[i]);
   return string;
 }
 
 char __far *
 __far
-_fstrlwr
+_dosix__fstrlwr
 (char __far *string)
 {
+  assert (string);
   return (char __far *)
-    _strlwr ((char *) string);
+    _dosix__strlwr ((char *) string);
 }
 
 
 /* _strupr functions */
 
 char *
-_strupr
+_dosix__strupr
 (char *string)
 {
-  size_t len = strlen (string);
+  assert (string);
+  size_t len = _dosix_strlen (string);
   for (size_t i = 0; i < len; i++)
-    string[i] = toupper (string[i]);
+    string[i] = _dosix_toupper (string[i]);
   return string;
 }
 
 char __far *
 __far
-_fstrupr
+_dosix__fstrupr
 (char __far *string)
 {
+  assert (string);
   return (char __far *)
-    _strupr ((char *) string);
+    _dosix__strupr ((char *) string);
 }
 
-/*  */
-/* /\* _strdup functions *\/ */
-/* char * */
-/* _strdup */
-/* (const char *string) */
-/* { */
-/*   size_t len = strlen (string); */
-/*   char *new_string = _dosix_malloc (); */
-/* } */
+
+/* strcpy functions */
+
+char *
+_dosix_strcpy
+(char *string1,
+ const char *string2)
+{
+  assert (string1), assert (string2);
+  return strcpy (string1, string2);
+}
+
+char __far *
+__far
+_dosix__fstrcpy
+(char __far *string1,
+ const char __far *string2)
+{
+  assert (string1), assert (string2);
+  return _dosix_strcpy ((char *) string1,
+			(const char *) string2);
+}
+
+
+/* strcat functions */
+
+char *
+_dosix_strcat
+(char *string1,
+ const char *string2)
+{
+  assert (string1), assert (string2);
+  return strcat (string1, string2);
+}
+
+char __far *
+__far
+_dosix__fstrcat
+(char __far *string1,
+ const char __far *string2)
+{
+  assert (string1), assert (string2);
+  return _dosix_strcat ((char *) string1,
+			(const char *) string2);
+}
+
+
+/* _strdup functions */
+char *
+_dosix__strdup
+(const char *string)
+{
+  assert (string);
+  size_t len = _dosix_strlen (string);
+  char *new_string = _dosix_malloc (len + 1);
+  return _dosix_strcpy (new_string, string);
+}
+
+char __far *
+__far
+_dosix__fstrdup
+(const char __far *string)
+{
+  assert (string);
+  return (char __far *)
+    _dosix__strdup ((const char *) string);
+}
+
+char __near *
+__far
+_dosix__nstrdup
+(const char __far *string)
+{
+  assert (string);
+  return (char __near *)
+    _dosix__strdup ((const char *) string);
+}

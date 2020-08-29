@@ -30,7 +30,7 @@
 #include <malloc.h>
 #include <mcheck.h>
 #include <search.h>
-#include <dos/malloc.h>
+#include <dosix/malloc.h>
 
 
 /* forward declarations */
@@ -103,11 +103,11 @@ _dosix_malloc
     }
   assert (entryinfo == *_entryinfo);
   return (void *)
-    entryinfo + sizeof (*entryinfo);
+    (entryinfo + 1);
 }
 
 void __based (void) *
-_bmalloc
+_dosix__bmalloc
   (__segment seg,
    size_t size)
 {
@@ -116,14 +116,14 @@ _bmalloc
 }
 
 void __far *
-_fmalloc (size_t size)
+_dosix__fmalloc (size_t size)
 {
   return (void __far *)
     _dosix_malloc (size);
 }
 
 void __near *
-_nmalloc
+_dosix__nmalloc
 (size_t size)
 {
   return (void __near *)
@@ -169,11 +169,12 @@ _dosix_realloc
     return NULL;
   *_entryinfo = entryinfo._pentry;
   **_entryinfo = entryinfo;
-  return *_entryinfo + sizeof (**_entryinfo);
+  return (void *)
+    (*_entryinfo + 1);
 }
 
 void __based (void) *
-  _brealloc
+  _dosix__brealloc
   (__segment seg,
    void __based (void) *memblock,
    size_t size)
@@ -184,7 +185,7 @@ void __based (void) *
 }
 
 void __far *
-_frealloc
+_dosix__frealloc
 (void __far *memblock,
  size_t size)
 {
@@ -194,7 +195,7 @@ _frealloc
 }
 
 void __near *
-_nrealloc
+_dosix__nrealloc
 (void __near *memblock,
  size_t size)
 {
@@ -235,7 +236,7 @@ _dosix_free
 }
 
 void
-_bfree
+_dosix__bfree
 (__segment seg,
  void __based (void) *memblock)
 {
@@ -243,14 +244,14 @@ _bfree
 }
 
 void
-_ffree
+_dosix__ffree
 (void __far *memblock)
 {
   _dosix_free ((void *) memblock);
 }
 
 void
-_nfree
+_dosix__nfree
 (void __near *memblock)
 {
   _dosix_free ((void *) memblock);
@@ -260,7 +261,7 @@ _nfree
 /* _msize functions */
 
 size_t
-_msize
+_dosix__msize
 (void *memblock)
 {
   _HEAPINFO entryinfo =
@@ -282,25 +283,25 @@ _msize
 }
 
 size_t
-_bmsize
+_dosix__bmsize
 (__segment seg,
  void __based (void) *memblock)
 {
-  return _msize ((void *) memblock);
+  return _dosix__msize ((void *) memblock);
 }
 
 size_t
-_fmsize
+_dosix__fmsize
 (void __far *memblock)
 {
-  return _msize ((void *) memblock);
+  return _dosix__msize ((void *) memblock);
 }
 
 size_t
-_nmsize
+_dosix__nmsize
 (void __near *memblock)
 {
-  return _msize ((void *) memblock);
+  return _dosix__msize ((void *) memblock);
 }
 
 
@@ -316,13 +317,13 @@ __bheapchk
     return;
   const _HEAPINFO *entryinfo = nodep;
   assert (entryinfo->_pentry);
-  int status = _bheapchk (entryinfo->_pentry);
+  int status = _dosix__bheapchk (entryinfo->_pentry);
   if (status != _HEAPOK)
     heapstatus = status;
 }
 
 int
-_bheapchk
+_dosix__bheapchk
 (void *seg)
 {
   if (! seg)
@@ -353,22 +354,22 @@ _bheapchk
 }
 
 int
-_heapchk
+_dosix__heapchk
 (void)
 {
-  return _bheapchk (NULL);
+  return _dosix__bheapchk (NULL);
 }
 
 int
-_fheapchk
+_dosix__fheapchk
 (void)
 {
-  return _heapchk ();
+  return _dosix__heapchk ();
 }
 
 int
-_nheapchk
+_dosix__nheapchk
 (void)
 {
-  return _heapchk ();
+  return _dosix__heapchk ();
 }

@@ -20,17 +20,28 @@
 #ifndef _INC_PROCESS
 #define _INC_PROCESS
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
+
+#ifndef _DOSIX_LIBC_SRC
+#define exit _dosix_exit
+#define _exit _dosix__exit
+#define _cexit _dosix__cexit
+#define _c_exit _dosix__c_exit
+#define system _dosix_system
+#endif	/* ! _DOSIX_LIBC_SRC */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+  /* exit functions */
   void __cdecl _dosix_exit (int);
   void __cdecl _dosix__exit (int);
-  void __cdecl _cexit (void);
-  void __cdecl _c_exit (void);
+  void __cdecl _dosix__cexit (void);
+  void __cdecl _dosix__c_exit (void);
+  /* system */
+  int __cdecl _dosix_system (const char *);
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	/* ! _INC_PROCESS */

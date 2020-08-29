@@ -26,7 +26,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <dos/stdlib.h>
+#include <stdint.h>
+#include <dosix/stdlib.h>
 #include "_stdlib.h"
 
 
@@ -131,4 +132,25 @@ _fonexit
   return ! register_cleanup (&ce)
     ? func
     : NULL;
+}
+
+
+/* max, min */
+
+intmax_t
+_dosix__max
+(intmax_t a, intmax_t b)
+{
+  return a > b
+    ? a
+    : b;
+}
+
+intmax_t
+_dosix__min
+(intmax_t a, intmax_t b)
+{
+  return a < b
+    ? a
+    : b;
 }

@@ -20,7 +20,7 @@
 #ifndef _INC__STDLIB
 #define _INC__STDLIB
 
-#include <dos/stdlib.h>
+#include <dosix/stdlib.h>
 
 #define EXIT_CLEANUP_STACK_SIZE 32
 

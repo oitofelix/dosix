@@ -26,18 +26,18 @@
 #include <assert.h>
 #include <stdio.h>
 #include <dos.h>
-#include <dos/time.h>
+#include <dosix/time.h>
 
 
 /* _strdate */
 
 char *
-_strdate
+_dosix__strdate
 (char *datestr)
 {
   assert (datestr);
   struct _dosdate_t date;
-  _dos_getdate (&date);
+  _dosix__dos_getdate (&date);
   /* let sprintf fail silently */
   sprintf (datestr,
 	   "%02d/%02d/%02d",
@@ -51,12 +51,12 @@ _strdate
 /* _strtime */
 
 char *
-_strtime
+_dosix__strtime
 (char *timestr)
 {
   assert (timestr);
   struct _dostime_t time;
-  _dos_gettime (&time);
+  _dosix__dos_gettime (&time);
   /* let sprintf fail silently */
   sprintf (timestr,
 	   "%02d:%02d:%02d",

@@ -42,8 +42,8 @@
 #include <dos.h>
 #include <share.h>
 #include <conio.h>
-#include <dos/stdlib.h>
-#include <dos/fcntl.h>
+#include <dosix/stdlib.h>
+#include <dosix/fcntl.h>
 
 
 /* DOS interrupt services enumeration */
@@ -526,7 +526,7 @@ static syscall_t _dosk_vect[UINT8_MAX] =
 /* _dosexterr */
 
 int
-_dosexterr
+_dosix__dosexterr
 (struct _DOSERROR *_errorinfo)
 {
   switch (errno)
@@ -1160,7 +1160,7 @@ _dosk86exterr
   assert (cpu->h.bh == INT21_BH_EXTERR);
   assert (cpu->l.bl == INT21_BL_EXTERR);
   struct _DOSERROR errorinfo = {0};
-  _dosexterr (&errorinfo);
+  _dosix__dosexterr (&errorinfo);
   cpu->r.ax = errorinfo.exterror;
   cpu->h.bh = errorinfo.errclass;
   cpu->l.bl = errorinfo.action;
@@ -1257,10 +1257,10 @@ free_paragraphs
   struct _DOSERROR errorinfo = {0};
   uintptr_t free_pages = sysconf (_SC_AVPHYS_PAGES);
   if (free_pages == -1)
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   uintptr_t page_size = sysconf (_SC_PAGESIZE);
   if (page_size == -1)
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   *count = (free_pages * page_size) / 16;
   return 0;
 }
@@ -1274,7 +1274,7 @@ _dosk__allocmem_error
   struct _DOSERROR errorinfo = {0};
   unsigned err = free_paragraphs (count);
   if (err) return err;
-  return _dosexterr (&errorinfo);
+  return _dosix__dosexterr (&errorinfo);
 }
 
 static
@@ -1289,7 +1289,7 @@ _dosk__allocmem_cmp
 }
 
 unsigned
-_dos_allocmem
+_dosix__dos_allocmem
 (size_t size,
  uintptr_t *seg)
 {
@@ -1334,8 +1334,8 @@ _dosk86_allocmem
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_ALLOCMEM);
   uintptr_t seg;
-  cpu->r.ax = _dos_allocmem (cpu->r.bx,
-			     &seg);
+  cpu->r.ax = _dosix__dos_allocmem (cpu->r.bx,
+				    &seg);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
   if (cpu->r.flags)
     cpu->r.bx = seg;
@@ -1347,7 +1347,7 @@ _dosk86_allocmem
 /* _dos_setblock */
 
 unsigned
-_dos_setblock
+_dosix__dos_setblock
 (size_t size,
  uintptr_t seg,
  size_t *maxsize)
@@ -1366,7 +1366,7 @@ _dos_setblock
   if (! allocmem_ptr)
     {
       errno = EFAULT;
-      return _dosexterr (&errorinfo);
+      return _dosix__dosexterr (&errorinfo);
     }
   assert (allocmem.address == (*allocmem_ptr)->address);
   allocmem.address = mremap (allocmem.address,
@@ -1388,9 +1388,9 @@ _dosk86_setblock
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_SETBLOCK);
   uintptr_t maxsize;
-  cpu->r.ax = _dos_setblock (cpu->r.bx,
-			     cpu->r.es,
-			     &maxsize);
+  cpu->r.ax = _dosix__dos_setblock (cpu->r.bx,
+				    cpu->r.es,
+				    &maxsize);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
   cpu->r.bx = cpu->r.flags ? maxsize : cpu->r.bx;
 }
@@ -1399,7 +1399,7 @@ _dosk86_setblock
 /* _dos_freemem */
 
 unsigned
-_dos_freemem
+_dosix__dos_freemem
 (uintptr_t seg)
 {
   assert (seg);
@@ -1415,7 +1415,7 @@ _dos_freemem
   if (! allocmem_ptr)
     {
       errno = EFAULT;
-      return _dosexterr (&errorinfo);
+      return _dosix__dosexterr (&errorinfo);
     }
   assert (allocmem.address == (*allocmem_ptr)->address);
   if (munmap (allocmem.address,
@@ -1442,7 +1442,7 @@ _dosk86_freemem
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_FREEMEM);
-  cpu->r.ax = _dos_freemem (cpu->r.es);
+  cpu->r.ax = _dosix__dos_freemem (cpu->r.es);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
@@ -1467,13 +1467,13 @@ __dos_creat
 		 flags,
 		 mode);
   if (fd < 0)
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   *handle = fd;
   return 0;
 }
 
 unsigned
-_dos_creat
+_dosix__dos_creat
 (const char * filename,
  unsigned attrib,
  int *handle)
@@ -1492,15 +1492,15 @@ _dosk86_creat
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_CREAT);
   int handle;
-  cpu->r.ax = _dos_creat (_MK_FP (cpu->r.ds, cpu->r.dx),
-			  cpu->r.cx,
-			  &handle);
+  cpu->r.ax = _dosix__dos_creat (_MK_FP (cpu->r.ds, cpu->r.dx),
+				 cpu->r.cx,
+				 &handle);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
   cpu->r.ax = cpu->r.ax ? cpu->r.ax : handle;
 }
 
 unsigned
-_dos_creatnew
+_dosix__dos_creatnew
 (const char * filename,
  unsigned attrib,
  int *handle)
@@ -1519,9 +1519,9 @@ _dosk86_creatnew
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_CREATNEW);
   int handle;
-  cpu->r.ax = _dos_creat (_MK_FP (cpu->r.ds, cpu->r.dx),
-			  cpu->r.cx,
-			  &handle);
+  cpu->r.ax = _dosix__dos_creat (_MK_FP (cpu->r.ds, cpu->r.dx),
+				 cpu->r.cx,
+				 &handle);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
   cpu->r.ax = cpu->r.ax ? cpu->r.ax : handle;
 }
@@ -1530,7 +1530,7 @@ _dosk86_creatnew
 /* _dos_open */
 
 unsigned
-_dos_open
+_dosix__dos_open
 (const char *path,
  unsigned mode,
  int *handle)
@@ -1542,7 +1542,7 @@ _dos_open
     | (mode & _O_RDWR ? O_RDWR : 0);
   int fd = open (path, flags);
   if (fd < 0)
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   if (! (mode & _SH_DENYNO))
     {
       struct flock flock =
@@ -1556,16 +1556,16 @@ _dos_open
 	 .l_len = 0		/* Lock the entire file */
 	};
       if (fcntl (fd, F_SETLK, &flock) == -1)
-	return _dosexterr (&errorinfo);	/* TODO? better error handling */
+	return _dosix__dosexterr (&errorinfo);	/* TODO? better error handling */
     }
   if (mode & _O_NOINHERIT)
     {
       int flags = fcntl (fd, F_GETFD, 0);
       if (flags == -1)
-	return _dosexterr (&errorinfo);	/* TODO? better error handling */
+	return _dosix__dosexterr (&errorinfo);	/* TODO? better error handling */
       flags |= FD_CLOEXEC;
       if (fcntl (fd, F_SETFD, flags) == -1)
-	return _dosexterr (&errorinfo);	/* TODO? better error handling */
+	return _dosix__dosexterr (&errorinfo);	/* TODO? better error handling */
     }
   *handle = fd;
   return 0;
@@ -1584,9 +1584,9 @@ _dosk86_open
 
      What should we do about it?  Now it’s simply ignored. */
   int handle;
-  cpu->r.ax = _dos_open (_MK_FP (cpu->r.ds, cpu->r.dx),
-			 cpu->l.al,
-			 &handle);
+  cpu->r.ax = _dosix__dos_open (_MK_FP (cpu->r.ds, cpu->r.dx),
+				cpu->l.al,
+				&handle);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
   cpu->r.ax = cpu->r.ax ? cpu->r.ax : handle;
 }
@@ -1595,12 +1595,12 @@ _dosk86_open
 /* _dos_close */
 
 unsigned
-_dos_close
+_dosix__dos_close
 (int handle)
 {
   struct _DOSERROR errorinfo = {0};
   if (close (handle))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 
@@ -1611,7 +1611,7 @@ _dosk86_close
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_CLOSE);
-  cpu->r.ax = _dos_close (cpu->r.bx);
+  cpu->r.ax = _dosix__dos_close (cpu->r.bx);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
@@ -1619,14 +1619,14 @@ _dosk86_close
 /* _dos_getfileattr */
 
 unsigned
-_dos_getfileattr
+_dosix__dos_getfileattr
 (const char *path,
  unsigned *attrib)
 {
   struct _DOSERROR errorinfo = {0};
   struct stat fs;
   if (stat (path, &fs))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   unsigned _attrib = 0;
   if (S_ISDIR (fs.st_mode))
     _attrib = _A_SUBDIR;
@@ -1642,7 +1642,7 @@ _dos_getfileattr
 	    break;
 	  case ENOENT:
 	  default:
-	    return _dosexterr (&errorinfo);
+	    return _dosix__dosexterr (&errorinfo);
 	  }
     }
   *attrib = _attrib;
@@ -1658,8 +1658,8 @@ _dosk86_getfileattr
   assert (cpu->h.ah == INT21_AH_FILE_METADATA);
   assert (cpu->l.al == INT21_AL_FILE_METADATA_GETFILEATTR);
   unsigned attrib;
-  cpu->r.ax = _dos_getfileattr (_MK_FP (cpu->r.ds, cpu->r.dx),
-				&attrib);
+  cpu->r.ax = _dosix__dos_getfileattr (_MK_FP (cpu->r.ds, cpu->r.dx),
+				       &attrib);
   cpu->r.cx = attrib;
   cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
@@ -1668,14 +1668,14 @@ _dosk86_getfileattr
 /* _dos_setfileattr */
 
 unsigned
-_dos_setfileattr
+_dosix__dos_setfileattr
 (const char *path,
  unsigned attrib)
 {
   struct _DOSERROR errorinfo;
   struct stat fs;
   if (stat (path, &fs))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
 
   mode_t mode = fs.st_mode;
 
@@ -1684,7 +1684,7 @@ _dos_setfileattr
   else mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
 
   if (chmod (path, mode))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
 
   return 0;
 }
@@ -1697,8 +1697,8 @@ _dosk86_setfileattr
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_FILE_METADATA);
   assert (cpu->l.al == INT21_AL_FILE_METADATA_SETFILEATTR);
-  cpu->r.ax = _dos_setfileattr (_MK_FP (cpu->r.ds, cpu->r.dx),
-				cpu->r.cx);
+  cpu->r.ax = _dosix__dos_setfileattr (_MK_FP (cpu->r.ds, cpu->r.dx),
+				       cpu->r.cx);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
@@ -1842,7 +1842,7 @@ __dostime_int
 /* _dos_getftime */
 
 unsigned
-_dos_getftime
+_dosix__dos_getftime
 (int handle,
  unsigned *date,
  unsigned *time)
@@ -1850,7 +1850,7 @@ _dos_getftime
   struct _DOSERROR errorinfo = {0};
   struct stat fs;
   if (fstat (handle, &fs))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   unsigned err = __dostime_int (&fs.st_mtime,
 				date,
 				time);
@@ -1866,9 +1866,9 @@ _dosk86_getftime
   assert (cpu->h.ah == INT21_AH_FILE_TIME);
   assert (cpu->l.al == INT21_AL_FILE_TIME_GETFTIME);
   unsigned date, time;
-  cpu->r.ax = _dos_getftime (cpu->r.bx,
-			     &date,
-			     &time);
+  cpu->r.ax = _dosix__dos_getftime (cpu->r.bx,
+				    &date,
+				    &time);
   cpu->r.cx = time;
   cpu->r.dx = date;
   cpu->r.flags = cpu->r.ax ? 1 : 0;
@@ -1878,7 +1878,7 @@ _dosk86_getftime
 /* _dos_setftime */
 
 unsigned
-_dos_setftime
+_dosix__dos_setftime
 (int handle,
  unsigned date,
  unsigned time)
@@ -1889,7 +1889,7 @@ _dos_setftime
   if (err) return err;
   struct stat fs;
   if (fstat (handle, &fs))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   struct timeval tvp[2] =
     {
      {
@@ -1902,7 +1902,7 @@ _dos_setftime
      }
     };
   if (futimes (handle, tvp))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 
@@ -1914,9 +1914,9 @@ _dosk86_setftime
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_FILE_TIME);
   assert (cpu->l.al == INT21_AL_FILE_TIME_SETFTIME);
-  cpu->r.ax = _dos_setftime (cpu->r.bx,
-			     cpu->r.dx,
-			     cpu->r.cx);
+  cpu->r.ax = _dosix__dos_setftime (cpu->r.bx,
+				    cpu->r.dx,
+				    cpu->r.cx);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
@@ -1935,7 +1935,7 @@ _dosk_findnext
     {
       char *filename = cdta->find_t._glob.gl_pathv[cdta->find_t._gl_pathi];
       unsigned attrib;
-      if (_dos_getfileattr (filename, &attrib))
+      if (_dosix__dos_getfileattr (filename, &attrib))
 	continue; /* ignore files for which attributes can’t be queried */
       struct stat fs;
       if (stat (filename, &fs))
@@ -1986,8 +1986,8 @@ _dosk86_findnext
 }
 
 unsigned
-_dos_findnext
-(struct _find_t *fileinfo)	/* File-information buffer */
+_dosix__dos_findnext
+(struct _find_t *fileinfo)
 {
   union dta_t *prev_dta = _dosk_get_dta_addr ();
   _dosk_set_dta_addr ((union dta_t *) fileinfo);
@@ -2051,7 +2051,7 @@ _dosk_findfirst
       break;
     case GLOB_ABORTED:
       globfree (pglob);
-      return _dosexterr (&errorinfo);
+      return _dosix__dosexterr (&errorinfo);
     case GLOB_NOMATCH:
       globfree (pglob);
       errorinfo.exterror = EXTERR_FILE_NOT_FOUND;
@@ -2090,7 +2090,7 @@ _dosk86_findfirst
 }
 
 unsigned
-_dos_findfirst
+_dosix__dos_findfirst
 (const char *filename,
  unsigned attrib,
  struct _find_t *fileinfo)
@@ -2103,11 +2103,18 @@ _dos_findfirst
   return ret;
 }
 
+void
+_dosix__dos_findclose
+(struct _find_t *fileinfo)
+{
+  return;
+}
+
 
 /* _dos_getdate */
 
 void
-_dos_getdate
+_dosix__dos_getdate
 (struct _dosdate_t *date)
 {
   assert (date);
@@ -2125,7 +2132,7 @@ _dosk86_getdate
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_GETDATE);
   struct _dosdate_t date;
-  _dos_getdate (&date);
+  _dosix__dos_getdate (&date);
   cpu->r.cx = date.year;
   cpu->h.dh = date.month;
   cpu->l.dl = date.day;
@@ -2136,18 +2143,18 @@ _dosk86_getdate
 /* _dos_setdate */
 
 unsigned
-_dos_setdate
+_dosix__dos_setdate
 (struct _dosdate_t *date)
 {
   assert (date);
   struct _DOSERROR errorinfo = {0};
   struct _dostime_t time;
-  _dos_gettime (&time);
+  _dosix__dos_gettime (&time);
   struct timeval tv;
   unsigned err = __unixtime_struct (date, &time, &tv);
   if (err) return err;
   if (settimeofday (&tv, NULL))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 
@@ -2167,14 +2174,14 @@ _dosk86_setdate
   /* AL = result
      00h successful
      FFh invalid time, system time unchanged */
-  cpu->l.al = _dos_setdate (&date) ? 0xff : 0x00;
+  cpu->l.al = _dosix__dos_setdate (&date) ? 0xff : 0x00;
 }
 
 
 /* _dos_gettime */
 
 void
-_dos_gettime
+_dosix__dos_gettime
 (struct _dostime_t *time)
 {
   assert (time);
@@ -2192,7 +2199,7 @@ _dosk86_gettime
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_GETTIME);
   struct _dostime_t time;
-  _dos_gettime (&time);
+  _dosix__dos_gettime (&time);
   cpu->h.ch = time.hour;
   cpu->l.cl = time.minute;
   cpu->h.dh = time.second;
@@ -2203,18 +2210,18 @@ _dosk86_gettime
 /* _dos_settime */
 
 unsigned
-_dos_settime
+_dosix__dos_settime
 (struct _dostime_t *time)
 {
   assert (time);
   struct _DOSERROR errorinfo = {0};
   struct _dosdate_t date;
-  _dos_getdate (&date);
+  _dosix__dos_getdate (&date);
   struct timeval tv;
   unsigned err = __unixtime_struct (&date, time, &tv);
   if (err) return err;
   if (settimeofday (&tv, NULL))
-    return _dosexterr (&errorinfo); /* TODO? better error handling */
+    return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
   return 0;
 }
 
@@ -2235,7 +2242,7 @@ _dosk86_settime
   /* AL = result
      00h successful
      FFh invalid time, system time unchanged */
-  cpu->l.al = _dos_settime (&time) ? 0xff : 0x00;
+  cpu->l.al = _dosix__dos_settime (&time) ? 0xff : 0x00;
 }
 
 
@@ -2265,7 +2272,7 @@ _dosk86_getvect
 /* _dos_setvect */
 
 void
-_dos_setvect
+_dosix__dos_setvect
 (unsigned intnum,
  syscall_t syscall)
 {
@@ -2281,8 +2288,8 @@ _dosk86_setvect
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_SETVECT);
-  _dos_setvect (cpu->l.al,
-		_MK_FP (cpu->r.ds, cpu->r.dx));
+  _dosix__dos_setvect (cpu->l.al,
+		       _MK_FP (cpu->r.ds, cpu->r.dx));
 }
 
 
@@ -2322,7 +2329,7 @@ _dosk86_getch
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_GETCH);
-  cpu->l.al = _getch ();
+  cpu->l.al = _dosix__getch ();
 }
 
 static
@@ -2332,7 +2339,7 @@ _dosk86_getche
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_GETCHE);
-  cpu->l.al = _getche ();
+  cpu->l.al = _dosix__getche ();
 }
 
 static
@@ -2342,7 +2349,7 @@ _dosk86_putch
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_PUTCH);
-  cpu->l.al = _putch (cpu->l.dl);
+  cpu->l.al = _dosix__putch (cpu->l.dl);
 }
 
 
@@ -2392,7 +2399,7 @@ interrupt
 /* intr */
 
 void
-intr
+_dosix_intr
 (int intnum,
  union REGPACK *regs)
 {
@@ -2421,7 +2428,7 @@ intr
 /* _int86x */
 
 int
-_int86x
+_dosix__int86x
 (int intnum,
  union _REGS *inregs,
  union _REGS *outregs,
@@ -2480,50 +2487,50 @@ _int86x
 /* _int86 */
 
 int
-_int86
+_dosix__int86
 (int intnum,
  union _REGS *inregs,
  union _REGS *outregs)
 {
-  return _int86x (intnum,
-		  inregs,
-		  outregs,
-		  NULL);
+  return _dosix__int86x (intnum,
+			 inregs,
+			 outregs,
+			 NULL);
 }
 
 
 /* _intdosx */
 
 int
-_intdosx
+_dosix__intdosx
 (union _REGS *inregs,
  union _REGS *outregs,
  struct _SREGS *segregs)
 {
-  return _int86x (INT21_MAIN_DOS_API,
-		  inregs,
-		  outregs,
-		  segregs);
+  return _dosix__int86x (INT21_MAIN_DOS_API,
+			 inregs,
+			 outregs,
+			 segregs);
 }
 
 
 /* _intdos */
 
 int
-_intdos
+_dosix__intdos
 (union _REGS *inregs,
  union _REGS *outregs)
 {
-  return _intdosx (inregs,
-		   outregs,
-		   NULL);
+  return _dosix__intdosx (inregs,
+			  outregs,
+			  NULL);
 }
 
 
 /* _bdos */
 
 int
-_bdos
+_dosix__bdos
 (int dosfunc,
  unsigned int dosdx,
  unsigned int dosal)
@@ -2533,7 +2540,8 @@ _bdos
   inregs.h.ah = dosfunc;
   inregs.x.dx = dosdx;
   inregs.h.al = dosal;
-  return _intdos (&inregs, &outregs);
+  return _dosix__intdos (&inregs,
+			 &outregs);
 }
 
 

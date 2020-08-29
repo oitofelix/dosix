@@ -20,7 +20,7 @@
 #ifndef _INC_SHARE
 #define _INC_SHARE
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
 #define _SH_COMPAT 0x00 /* compatibility mode */
 #define _SH_CMPAT _SH_CMPAT /* documented alias (typo?) */
@@ -29,19 +29,13 @@
 #define _SH_DENYRD 0x30 /* deny read mode */
 #define _SH_DENYNO 0x40 /* deny none mode */
 
+#ifndef __STRICT_ANSI__
 #define SH_COMPAT _SH_COMPAT
 #define SH_CMPAT _SH_CMPAT
 #define SH_DENYRW _SH_DENYRW
 #define SH_DENYWR _SH_DENYWR
 #define SH_DENYRD _SH_DENYRD
 #define SH_DENYNO _SH_DENYNO
+#endif	/* ! __STRICT_ANSI__ */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif	/* ! _INC_SHARE */

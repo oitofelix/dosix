@@ -1,5 +1,5 @@
 /*
-  stdio.h -- Standard input/output
+  time.h -- Date and time
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,21 +17,23 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_STDIO
-#define _INC_STDIO
+#ifndef _INC_DOS_TIME
+#define _INC_DOS_TIME
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
 #ifndef _DOSIX_LIBC_SRC
-#define printf _dosix_printf
-#endif
+#define _strtime _dosix__strtime
+#define _strdate _dosix__strdate
+#endif	/* ! _DOSIX_LIBC_SRC */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  int __cdecl _dosix_printf (const char *format, ...);
+  char * __cdecl _dosix__strtime (char *timestr);
+  char * __cdecl _dosix__strdate (char *datestr);
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	/* ! _INC_DOS_TIME */

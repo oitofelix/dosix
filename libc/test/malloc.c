@@ -2,9 +2,9 @@
  * the memory with free.
  */
 
-#include <dos/stdlib.h>         /* Definition of _MAX_PATH */
-#include <dos/stdio.h>
-#include <dos/malloc.h>
+#include <dosix/stdlib.h>         /* Definition of _MAX_PATH */
+#include <dosix/stdio.h>
+#include <dosix/malloc.h>
 
 void main( void )
 {

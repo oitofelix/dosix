@@ -24,7 +24,7 @@
 /* headers */
 #include <stdarg.h>
 #include <stdio.h>
-#include <dos/stdio.h>
+#include <dosix/stdio.h>
 
 
 /* printf */
@@ -37,4 +37,14 @@ _dosix_printf
   va_start (ap, format);
   return vprintf (format,
 		  ap);
+}
+
+
+/* perror */
+
+void
+_dosix_perror
+(const char *string)
+{
+  perror (string);
 }

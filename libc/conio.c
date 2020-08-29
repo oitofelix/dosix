@@ -33,12 +33,12 @@
 
 /* _cputs */
 int
-_cputs
+_dosix__cputs
 (const char *string)
 {
   assert (string);
   for (size_t i = 0; string[i]; i++)
-    if (_putch (string[i]) == EOF)
+    if (_dosix__putch (string[i]) == EOF)
       return -1; /* return non-zero value on error */
   return 0;
 }
@@ -75,14 +75,14 @@ __getch
 }
 
 int
-_getch
+_dosix__getch
 (void)
 {
   return __getch (0);
 }
 
 int
-_getche
+_dosix__getche
 (void)
 {
   return __getch (1);
@@ -92,7 +92,7 @@ _getche
 /* _putch */
 
 int
-_putch
+_dosix__putch
 (int c)
 {
   char ch = c;

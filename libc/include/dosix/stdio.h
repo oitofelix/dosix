@@ -1,5 +1,5 @@
 /*
-  string.h -- String handling
+  stdio.h -- Standard input/output
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,27 +17,23 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_STRING
-#define _INC_STRING
+#ifndef _INC_DOS_STDIO
+#define _INC_DOS_STDIO
 
-#include <dos/compiler.h>
+#include <dosix/compiler.h>
 
-#define strlwr _strlwr
-#define fstrlwr _fstrlwr
-#define strupr _strupr
-#define fstrupr _fstrupr
+#ifndef _DOSIX_LIBC_SRC
+#define printf _dosix_printf
+#define perror _dosix_perror
+#endif	/* ! _DOSIX_LIBC_SRC */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  /* strlwr */
-  char * __cdecl _strlwr (char *);
-  char __far * __far _fstrlwr (char __far *);
-  /* strupr */
-  char * __cdecl _strupr (char *);
-  char __far * __far _fstrupr (char __far *);
+  int __cdecl _dosix_printf (const char *, ...);
+  void __cdecl _dosix_perror (const char *);
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	/* ! _INC_DOS_STDIO */

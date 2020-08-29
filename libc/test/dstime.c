@@ -4,8 +4,8 @@
 
 #include <dos.h>
 #include <conio.h>
-#include <dosix_stdio.h>
-#include <dosix_time.h>
+#include <dosix/stdio.h>
+#include <dosix/time.h>
 
 void main( void )
 {
