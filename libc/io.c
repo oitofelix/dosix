@@ -30,7 +30,7 @@
 /* _filelength */
 
 off_t
-_filelength
+_dosix__filelength
 (int handle)
 {
   struct stat fs;

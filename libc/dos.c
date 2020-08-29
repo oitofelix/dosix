@@ -111,33 +111,33 @@ union dta_t {
 
 static
 void
-_dosk_int21_main_dos_api
+int21_main_dos_api
 (cpu_t *);
 
 static
 void
-_dosk_int2f_multiplex
+int2f_multiplex
 (cpu_t *);
 
 
 /* global public variables */
 
 /* Holds extended error code for libc usage.  Set by
-   __doskexterr_set */
+   exterr_set */
 int __near _doserrno;
 
 
 /* global private variables */
 
-static void *_dosk__allocmem_tree;
+static void *allocmem_tree;
 static struct _DOSERROR errorinfo;
 static struct media_id media_id;
-static union dta_t _dosk_dta;
-static union dta_t *_dosk_current_dta = &_dosk_dta;
-static syscall_t _dosk_vect[UINT8_MAX] =
+static union dta_t dta;
+static union dta_t *current_dta = &dta;
+static syscall_t int_vect[UINT8_MAX] =
   {
-   [INT21_MAIN_DOS_API] = _dosk_int21_main_dos_api,
-   [INT2F_MULTIPLEX] = _dosk_int2f_multiplex
+   [INT21_MAIN_DOS_API] = int21_main_dos_api,
+   [INT2F_MULTIPLEX] = int2f_multiplex
   };
 
 
@@ -1152,7 +1152,7 @@ _dosix__dosexterr
 
 static
 void
-_dosk86exterr
+cpu_exterr
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1174,7 +1174,7 @@ _dosk86exterr
 
 static
 int
-__doskexterr_set
+exterr_set
 (struct _DOSERROR *new_errorinfo, int _errno)
 {
   if (new_errorinfo->exterror != EXTERR_DONT_CHANGE)
@@ -1195,13 +1195,13 @@ __doskexterr_set
 
 static
 void
-__dosk86exterr_set
+cpu_exterr_set
 (cpu_t *cpu)
 {
   assert (cpu);
   assert (cpu->h.ah == INT2F_AH_DOS_INTERNAL);
   assert (cpu->l.al == INT2F_AL_DOS_INTERNAL_EXTERR_SET);
-  __doskexterr_set (_MK_FP (cpu->r.ss, cpu->r.si), 0);
+  exterr_set (_MK_FP (cpu->r.ss, cpu->r.si), 0);
 }
 
 
@@ -1209,40 +1209,40 @@ __dosk86exterr_set
 
 static
 union dta_t *
-_dosk_get_dta_addr
+get_dta_addr
 (void)
 {
-  return _dosk_current_dta;
+  return current_dta;
 }
 
 static
 void
-_dosk86_get_dta_addr
+cpu_get_dta_addr
 (cpu_t *cpu)
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_GET_DTA_ADDR);
-  union dta_t *dta_ptr = _dosk_get_dta_addr ();
+  union dta_t *dta_ptr = get_dta_addr ();
   cpu->r.es = _FP_SEG (dta_ptr);
   cpu->r.bx = _FP_OFF (dta_ptr);
 }
 
 static
 void
-_dosk_set_dta_addr
+set_dta_addr
 (union dta_t *target_dta)
 {
-  _dosk_current_dta = target_dta;
+  current_dta = target_dta;
 }
 
 static
 void
-_dosk86_set_dta_addr
+cpu_set_dta_addr
 (cpu_t *cpu)
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_SET_DTA_ADDR);
-  _dosk_set_dta_addr (_MK_FP (cpu->r.ds, cpu->r.dx));
+  set_dta_addr (_MK_FP (cpu->r.ds, cpu->r.dx));
 }
 
 
@@ -1267,7 +1267,7 @@ free_paragraphs
 
 static
 unsigned
-_dosk__allocmem_error
+allocmem_error
 (uintptr_t *count)
 {
   assert (count);
@@ -1279,7 +1279,7 @@ _dosk__allocmem_error
 
 static
 int
-_dosk__allocmem_cmp
+allocmem_cmp
 (const void *_a,
  const void *_b)
 {
@@ -1298,7 +1298,7 @@ _dosix__dos_allocmem
   if (! size) return 0;
   struct allocmem *allocmem_ptr = malloc (sizeof (*allocmem_ptr));
   if (! allocmem_ptr)
-    return _dosk__allocmem_error (seg);
+    return allocmem_error (seg);
   allocmem_ptr->length = size * 16;
   allocmem_ptr->address = mmap (NULL,
 				allocmem_ptr->length,
@@ -1308,17 +1308,17 @@ _dosix__dos_allocmem
   if (allocmem_ptr->address == MAP_FAILED)
     {
       free (allocmem_ptr);
-      return _dosk__allocmem_error (seg);
+      return allocmem_error (seg);
     }
   else
     {
       struct allocmem **_allocmem_ptr = tsearch (allocmem_ptr,
-						 &_dosk__allocmem_tree,
-						 &_dosk__allocmem_cmp);
+						 &allocmem_tree,
+						 &allocmem_cmp);
       if (! _allocmem_ptr)
 	{
 	  free (allocmem_ptr);
-	  return _dosk__allocmem_error (seg);
+	  return allocmem_error (seg);
 	}
       assert (allocmem_ptr == *_allocmem_ptr);
       *seg = (uintptr_t) allocmem_ptr->address;
@@ -1328,7 +1328,7 @@ _dosix__dos_allocmem
 
 static
 void
-_dosk86_allocmem
+cpu_allocmem
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1361,8 +1361,8 @@ _dosix__dos_setblock
      .length = 16 * size
     };
   struct allocmem **allocmem_ptr = tfind (&allocmem,
-					  &_dosk__allocmem_tree,
-					  &_dosk__allocmem_cmp);
+					  &allocmem_tree,
+					  &allocmem_cmp);
   if (! allocmem_ptr)
     {
       errno = EFAULT;
@@ -1374,7 +1374,7 @@ _dosix__dos_setblock
 			     allocmem.length,
 			     0);
   if (allocmem.address == (void *) -1)
-    return _dosk__allocmem_error (maxsize);
+    return allocmem_error (maxsize);
   assert (allocmem.address == (void *) seg);
   **allocmem_ptr = allocmem;
   return 0;
@@ -1382,7 +1382,7 @@ _dosix__dos_setblock
 
 static
 void
-_dosk86_setblock
+cpu_setblock
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1410,8 +1410,8 @@ _dosix__dos_freemem
      .length = 0
     };
   struct allocmem **allocmem_ptr = tfind (&allocmem,
-					  &_dosk__allocmem_tree,
-					  &_dosk__allocmem_cmp);
+					  &allocmem_tree,
+					  &allocmem_cmp);
   if (! allocmem_ptr)
     {
       errno = EFAULT;
@@ -1425,11 +1425,11 @@ _dosix__dos_freemem
       errorinfo.errclass = ERRCLASS_INTERN_SYS_ERROR;
       errorinfo.action = ERRACT_IMMEDIATE_ABORT;
       errorinfo.locus = ERRLOCUS_MEM_RELATED;
-      return __doskexterr_set (&errorinfo, EINVAL);
+      return exterr_set (&errorinfo, EINVAL);
     }
   void *pnode = tdelete (&allocmem,
-			 &_dosk__allocmem_tree,
-			 &_dosk__allocmem_cmp);
+			 &allocmem_tree,
+			 &allocmem_cmp);
   assert (pnode);
   free (*allocmem_ptr);
   return 0;
@@ -1437,7 +1437,7 @@ _dosix__dos_freemem
 
 static
 void
-_dosk86_freemem
+cpu_freemem
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1451,7 +1451,7 @@ _dosk86_freemem
 
 static
 unsigned
-__dos_creat
+dos_creat
 (const char * filename,
  unsigned attrib,
  int *handle,
@@ -1478,15 +1478,15 @@ _dosix__dos_creat
  unsigned attrib,
  int *handle)
 {
-  return __dos_creat (filename,
-		      attrib,
-		      handle,
-		      O_RDWR | O_CREAT | O_TRUNC);
+  return dos_creat (filename,
+		    attrib,
+		    handle,
+		    O_RDWR | O_CREAT | O_TRUNC);
 }
 
 static
 void
-_dosk86_creat
+cpu_creat
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1505,15 +1505,15 @@ _dosix__dos_creatnew
  unsigned attrib,
  int *handle)
 {
-  return __dos_creat (filename,
-		      attrib,
-		      handle,
-		      O_RDWR | O_CREAT | O_TRUNC | O_EXCL);
+  return dos_creat (filename,
+		    attrib,
+		    handle,
+		    O_RDWR | O_CREAT | O_TRUNC | O_EXCL);
 }
 
 static
 void
-_dosk86_creatnew
+cpu_creatnew
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1573,7 +1573,7 @@ _dosix__dos_open
 
 static
 void
-_dosk86_open
+cpu_open
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1606,7 +1606,7 @@ _dosix__dos_close
 
 static
 void
-_dosk86_close
+cpu_close
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1651,7 +1651,7 @@ _dosix__dos_getfileattr
 
 static
 void
-_dosk86_getfileattr
+cpu_getfileattr
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1691,7 +1691,7 @@ _dosix__dos_setfileattr
 
 static
 void
-_dosk86_setfileattr
+cpu_setfileattr
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1707,7 +1707,7 @@ _dosk86_setfileattr
 
 static
 unsigned
-__unixtime_struct
+unixtime_struct
 (const struct _dosdate_t *date,
  const struct _dostime_t *time,
  struct timeval *tv)
@@ -1731,7 +1731,7 @@ __unixtime_struct
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      return __doskexterr_set (&errorinfo, EINVAL);
+      return exterr_set (&errorinfo, EINVAL);
     }
   tv->tv_sec = utime;
   tv->tv_usec = time->hsecond * 10000;
@@ -1740,7 +1740,7 @@ __unixtime_struct
 
 static
 unsigned
-__dostime_struct
+dostime_struct
 (const struct timeval *tv,
  struct _dosdate_t *date,
  struct _dostime_t *time)
@@ -1754,7 +1754,7 @@ __dostime_struct
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
     }
   if (date)
     *date = (struct _dosdate_t)
@@ -1778,7 +1778,7 @@ __dostime_struct
 /* Convert DOS date-time encoded integers to Unix time */
 static
 unsigned
-__unixtime_int
+unixtime_int
 (unsigned date,
  unsigned time,
  time_t *utime)
@@ -1801,7 +1801,7 @@ __unixtime_int
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
     }
   if (utime)
     *utime = _utime;
@@ -1811,7 +1811,7 @@ __unixtime_int
 /* Convert Unix time to DOS date-time encoded integers */
 static
 unsigned
-__dostime_int
+dostime_int
 (const time_t *utime,
  unsigned *date,
  unsigned *time)
@@ -1825,7 +1825,7 @@ __dostime_int
       errorinfo.errclass = ERRCLASS_APP_PROG_ERROR;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_UNKNOWN;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
     }
   if (date)
     *date = tm->tm_year - (1980 - 1900) << 9
@@ -1851,7 +1851,7 @@ _dosix__dos_getftime
   struct stat fs;
   if (fstat (handle, &fs))
     return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
-  unsigned err = __dostime_int (&fs.st_mtime,
+  unsigned err = dostime_int (&fs.st_mtime,
 				date,
 				time);
   return err ? err: 0;
@@ -1859,7 +1859,7 @@ _dosix__dos_getftime
 
 static
 void
-_dosk86_getftime
+cpu_getftime
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1885,7 +1885,7 @@ _dosix__dos_setftime
 {
   time_t _time;
   struct _DOSERROR errorinfo = {0};
-  unsigned err = __unixtime_int (date, time, &_time);
+  unsigned err = unixtime_int (date, time, &_time);
   if (err) return err;
   struct stat fs;
   if (fstat (handle, &fs))
@@ -1908,7 +1908,7 @@ _dosix__dos_setftime
 
 static
 void
-_dosk86_setftime
+cpu_setftime
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -1925,10 +1925,10 @@ _dosk86_setftime
 
 static
 unsigned
-_dosk_findnext
+findnext
 (void)
 {
-  union dta_t *cdta = _dosk_current_dta;
+  union dta_t *cdta = current_dta;
   for (;
        cdta->find_t._gl_pathi < cdta->find_t._glob.gl_pathc;
        cdta->find_t._gl_pathi++)
@@ -1948,9 +1948,9 @@ _dosk_findnext
 		  || ! cdta->find_t._attrib)))
 	{
 	  cdta->find_t.attrib = attrib;
-	  unsigned err = __dostime_int (&fs.st_mtime,
-					&cdta->find_t.wr_date,
-					&cdta->find_t.wr_time);
+	  unsigned err = dostime_int (&fs.st_mtime,
+				      &cdta->find_t.wr_date,
+				      &cdta->find_t.wr_time);
 	  if (err) return err;
 	  cdta->find_t.size = fs.st_size;
 	  memccpy (cdta->find_t.name, filename, 0,
@@ -1971,17 +1971,17 @@ _dosk_findnext
   errorinfo.errclass = ERRCLASS_NOT_FOUND;
   errorinfo.action = ERRACT_IGNORE;
   errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-  return __doskexterr_set (&errorinfo, 0);
+  return exterr_set (&errorinfo, 0);
 }
 
 static
 void
-_dosk86_findnext
+cpu_findnext
 (cpu_t *cpu)
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_FINDNEXT);
-  cpu->r.ax = _dosk_findnext ();
+  cpu->r.ax = findnext ();
   cpu->r.flags = cpu->r.ax ? 1 : 0;
 }
 
@@ -1989,10 +1989,10 @@ unsigned
 _dosix__dos_findnext
 (struct _find_t *fileinfo)
 {
-  union dta_t *prev_dta = _dosk_get_dta_addr ();
-  _dosk_set_dta_addr ((union dta_t *) fileinfo);
-  unsigned ret = _dosk_findnext ();
-  _dosk_set_dta_addr (prev_dta);
+  union dta_t *prev_dta = get_dta_addr ();
+  set_dta_addr ((union dta_t *) fileinfo);
+  unsigned ret = findnext ();
+  set_dta_addr (prev_dta);
   if (ret) errno = ENOENT;
   return ret;
 }
@@ -2010,21 +2010,21 @@ errfunc
       errorinfo.errclass = ERRCLASS_ACCESS_DENIED;
       errorinfo.action = ERRACT_ABORT_AFTER_CLEANUP;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
       break;
     case ENOENT:
       errorinfo.exterror = EXTERR_PATH_NOT_FOUND;
       errorinfo.errclass = ERRCLASS_NOT_FOUND;
       errorinfo.action = ERRACT_PROMPT_USR_REENTER_INPUT;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
       break;
     case EIO:
       errorinfo.exterror = EXTERR_READ_FAULT;
       errorinfo.errclass = ERRCLASS_MEDIA_ERROR;
       errorinfo.action = ERRACT_RETRY_AFTER_USR_INTERV;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
       break;
     default:		/* Get generic error handling based on libc */
       errno = error_code;
@@ -2035,13 +2035,13 @@ errfunc
 
 static
 unsigned
-_dosk_findfirst
+findfirst
 (char *filename,
  unsigned attrib,
  unsigned append_flag)
 {
   struct _DOSERROR errorinfo = {0};
-  union dta_t *cdta = _dosk_current_dta;
+  union dta_t *cdta = current_dta;
   glob_t *pglob = &cdta->find_t._glob;
   /* TODO: DOS expects ‘*.*’ to be interpreted as Unix’s ’*’ */
   /* TODO: DOS expects file-system to be case-insensitive */
@@ -2058,14 +2058,14 @@ _dosk_findfirst
       errorinfo.errclass = ERRCLASS_NOT_FOUND;
       errorinfo.action = ERRACT_PROMPT_USR_REENTER_INPUT;
       errorinfo.locus = ERRLOCUS_BLOCK_DEV;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
     case GLOB_NOSPACE:
       globfree (pglob);
       errorinfo.exterror = EXTERR_INSUF_MEM;
       errorinfo.errclass = ERRCLASS_OUT_OF_RESOURCE;
       errorinfo.action = ERRACT_IMMEDIATE_ABORT;
       errorinfo.locus = ERRLOCUS_MEM_RELATED;
-      return __doskexterr_set (&errorinfo, 0);
+      return exterr_set (&errorinfo, 0);
     default:			/* should never get here */
       assert (false);
     };
@@ -2073,17 +2073,17 @@ _dosk_findfirst
   cdta->find_t._gl_pathi = 0;
   cdta->find_t._filename = filename;
   cdta->find_t._attrib = attrib;
-  return _dosk_findnext ();
+  return findnext ();
 }
 
 static
 void
-_dosk86_findfirst
+cpu_findfirst
 (cpu_t *cpu)
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_FINDFIRST);
-  cpu->r.ax = _dosk_findfirst (_MK_FP (cpu->r.ds, cpu->r.dx),
+  cpu->r.ax = findfirst (_MK_FP (cpu->r.ds, cpu->r.dx),
 			       cpu->r.cx,
 			       cpu->l.al);
   cpu->r.flags = cpu->r.ax ? 1 : 0;
@@ -2095,10 +2095,10 @@ _dosix__dos_findfirst
  unsigned attrib,
  struct _find_t *fileinfo)
 {
-  union dta_t *prev_dta = _dosk_get_dta_addr ();
-  _dosk_set_dta_addr ((union dta_t *) fileinfo);
-  unsigned ret = _dosk_findfirst ((char *) filename, attrib, 0);
-  _dosk_set_dta_addr (prev_dta);
+  union dta_t *prev_dta = get_dta_addr ();
+  set_dta_addr ((union dta_t *) fileinfo);
+  unsigned ret = findfirst ((char *) filename, attrib, 0);
+  set_dta_addr (prev_dta);
   if (ret) errno = ENOENT;
   return ret;
 }
@@ -2121,12 +2121,12 @@ _dosix__dos_getdate
   struct timeval tv;
   if (gettimeofday (&tv, NULL))
     return;			/* fail silently */
-  __dostime_struct (&tv, date, NULL);
+  dostime_struct (&tv, date, NULL);
 }
 
 static
 void
-_dosk86_getdate
+cpu_getdate
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2151,7 +2151,7 @@ _dosix__dos_setdate
   struct _dostime_t time;
   _dosix__dos_gettime (&time);
   struct timeval tv;
-  unsigned err = __unixtime_struct (date, &time, &tv);
+  unsigned err = unixtime_struct (date, &time, &tv);
   if (err) return err;
   if (settimeofday (&tv, NULL))
     return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
@@ -2160,7 +2160,7 @@ _dosix__dos_setdate
 
 static
 void
-_dosk86_setdate
+cpu_setdate
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2188,12 +2188,12 @@ _dosix__dos_gettime
   struct timeval tv;
   if (gettimeofday (&tv, NULL))
     return;			/* fail silently */
-  __dostime_struct (&tv, NULL, time);
+  dostime_struct (&tv, NULL, time);
 }
 
 static
 void
-_dosk86_gettime
+cpu_gettime
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2218,7 +2218,7 @@ _dosix__dos_settime
   struct _dosdate_t date;
   _dosix__dos_getdate (&date);
   struct timeval tv;
-  unsigned err = __unixtime_struct (&date, time, &tv);
+  unsigned err = unixtime_struct (&date, time, &tv);
   if (err) return err;
   if (settimeofday (&tv, NULL))
     return _dosix__dosexterr (&errorinfo); /* TODO? better error handling */
@@ -2227,7 +2227,7 @@ _dosix__dos_settime
 
 static
 void
-_dosk86_settime
+cpu_settime
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2253,12 +2253,12 @@ _dos_getvect
 (unsigned intnum)
 {
   assert (intnum < UINT8_MAX);
-  return _dosk_vect[intnum];
+  return int_vect[intnum];
 }
 
 static
 void
-_dosk86_getvect
+cpu_getvect
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2278,12 +2278,12 @@ _dosix__dos_setvect
 {
   assert (syscall);
   assert (intnum < UINT8_MAX);
-  _dosk_vect[intnum] = syscall;
+  int_vect[intnum] = syscall;
 }
 
 static
 void
-_dosk86_setvect
+cpu_setvect
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2293,11 +2293,11 @@ _dosk86_setvect
 }
 
 
-/* _dosk_write_stdout */
+/* write_stdout */
 
 static
 unsigned
-_dosk_write_stdout
+write_stdout
 (const char *string)
 {
   for (size_t i = 0; string[i] != '$'; i++)
@@ -2310,13 +2310,13 @@ _dosk_write_stdout
 
 static
 void
-_dosk86_write_stdout
+cpu_write_stdout
 (cpu_t *cpu)
 {
   assert (cpu);
   assert (cpu->h.ah == INT21_AH_WRITE_STDOUT);
-  cpu->r.ax = _dosk_write_stdout (_MK_FP (cpu->r.ds,
-					  cpu->r.dx));
+  cpu->r.ax = write_stdout (_MK_FP (cpu->r.ds,
+				    cpu->r.dx));
 }
 
 
@@ -2324,7 +2324,7 @@ _dosk86_write_stdout
 
 static
 void
-_dosk86_getch
+cpu_getch
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2334,7 +2334,7 @@ _dosk86_getch
 
 static
 void
-_dosk86_getche
+cpu_getche
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2344,7 +2344,7 @@ _dosk86_getche
 
 static
 void
-_dosk86_putch
+cpu_putch
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2545,11 +2545,11 @@ _dosix__bdos
 }
 
 
-/* _dosk_int21_main_dos_api */
+/* int21_main_dos_api */
 
 static
 void
-_dosk_int21_main_dos_api
+int21_main_dos_api
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2560,10 +2560,10 @@ _dosk_int21_main_dos_api
       switch (cpu->l.al) /* AL */
 	{
 	case INT21_AL_FILE_METADATA_GETFILEATTR: /* 0x00 */
-	  syscall = _dosk86_getfileattr;
+	  syscall = cpu_getfileattr;
 	  break;
 	case INT21_AL_FILE_METADATA_SETFILEATTR: /* 0x01 */
-	  syscall = _dosk86_setfileattr;
+	  syscall = cpu_setfileattr;
 	  break;
 	}
       break;
@@ -2571,72 +2571,72 @@ _dosk_int21_main_dos_api
       switch (cpu->l.al) /* AL */
 	{
 	case INT21_AL_FILE_TIME_GETFTIME: /* 0x00 */
-	  syscall = _dosk86_getftime;
+	  syscall = cpu_getftime;
 	  break;
 	case INT21_AL_FILE_TIME_SETFTIME: /* 0x01 */
-	  syscall = _dosk86_setftime;
+	  syscall = cpu_setftime;
 	  break;
 	}
       break;
     case INT21_AH_GETCHE: /* 0x01 */
-      syscall = _dosk86_getche;
+      syscall = cpu_getche;
       break;
     case INT21_AH_PUTCH: /* 0x02 */
-      syscall = _dosk86_putch;
+      syscall = cpu_putch;
       break;
     case INT21_AH_GETCH: /* 0x08 */
-      syscall = _dosk86_getch;
+      syscall = cpu_getch;
       break;
     case INT21_AH_WRITE_STDOUT: /* 0x09 */
-      syscall = _dosk86_write_stdout;
+      syscall = cpu_write_stdout;
       break;
     case INT21_AH_SET_DTA_ADDR: /* 0x1a */
-      syscall = _dosk86_set_dta_addr;
+      syscall = cpu_set_dta_addr;
       break;
     case INT21_AH_SETVECT: /* 0x25 */
-      syscall = _dosk86_setvect;
+      syscall = cpu_setvect;
       break;
     case INT21_AH_GETDATE: /* 0x2a */
-      syscall = _dosk86_getdate;
+      syscall = cpu_getdate;
       break;
     case INT21_AH_SETDATE: /* 0x2b */
-      syscall = _dosk86_setdate;
+      syscall = cpu_setdate;
       break;
     case INT21_AH_GETTIME: /* 0x2c */
-      syscall = _dosk86_gettime;
+      syscall = cpu_gettime;
       break;
     case INT21_AH_SETTIME: /* 0x2d */
-      syscall = _dosk86_settime;
+      syscall = cpu_settime;
       break;
     case INT21_AH_GET_DTA_ADDR: /* 0x2f */
-      syscall = _dosk86_get_dta_addr;
+      syscall = cpu_get_dta_addr;
       break;
     case INT21_AH_GETVECT: /* 0x35 */
-      syscall = _dosk86_getvect;
+      syscall = cpu_getvect;
       break;
     case INT21_AH_CREAT: /* 0x3c */
-      syscall = _dosk86_creat;
+      syscall = cpu_creat;
       break;
     case INT21_AH_OPEN:	/* 0x3d */
-      syscall = _dosk86_open;
+      syscall = cpu_open;
       break;
     case INT21_AH_CLOSE: /* 0x3e */
-      syscall = _dosk86_close;
+      syscall = cpu_close;
       break;
     case INT21_AH_ALLOCMEM: /* 0x48 */
-      syscall = _dosk86_allocmem;
+      syscall = cpu_allocmem;
       break;
     case INT21_AH_FREEMEM: /* 0x49 */
-      syscall = _dosk86_freemem;
+      syscall = cpu_freemem;
       break;
     case INT21_AH_SETBLOCK: /* 0x4a */
-      syscall = _dosk86_setblock;
+      syscall = cpu_setblock;
       break;
     case INT21_AH_FINDFIRST: /* 0x4e */
-      syscall = _dosk86_findfirst;
+      syscall = cpu_findfirst;
       break;
     case INT21_AH_FINDNEXT: /* 0x4f */
-      syscall = _dosk86_findnext;
+      syscall = cpu_findnext;
       break;
     case INT21_AH_EXTERR: /* 0x59 */
       switch (cpu->h.bh) /* BH */
@@ -2645,14 +2645,14 @@ _dosk_int21_main_dos_api
 	  switch (cpu->l.bl) /* BL */
 	    {
 	    case INT21_BL_EXTERR: /* 0x00 */
-	      syscall = _dosk86exterr;
+	      syscall = cpu_exterr;
 	      break;
 	    }
 	  break;
 	}
       break;
     case INT21_AH_CREATNEW: /* 0x5b */
-      syscall = _dosk86_creatnew;
+      syscall = cpu_creatnew;
       break;
     }
   call_syscall (INT21_MAIN_DOS_API,
@@ -2661,11 +2661,11 @@ _dosk_int21_main_dos_api
 }
 
 
-/* _dosk_int2f_multiplex */
+/* int2f_multiplex */
 
 static
 void
-_dosk_int2f_multiplex
+int2f_multiplex
 (cpu_t *cpu)
 {
   assert (cpu);
@@ -2676,7 +2676,7 @@ _dosk_int2f_multiplex
       switch (cpu->l.al) /* AL */
 	{
 	case INT2F_AL_DOS_INTERNAL_EXTERR_SET: /* 0x22 */
-	  syscall = __dosk86exterr_set;
+	  syscall = cpu_exterr_set;
 	  break;
 	}
       break;

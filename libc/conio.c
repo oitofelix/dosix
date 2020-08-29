@@ -47,7 +47,7 @@ _dosix__cputs
 /* _getch functions */
 static
 int
-__getch
+getch
 (int echo)
 {
   struct termios termios_prev, termios_curr;
@@ -78,14 +78,14 @@ int
 _dosix__getch
 (void)
 {
-  return __getch (0);
+  return getch (0);
 }
 
 int
 _dosix__getche
 (void)
 {
-  return __getch (1);
+  return getch (1);
 }
 
 

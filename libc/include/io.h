@@ -20,6 +20,7 @@
 #ifndef _INC_IO
 #define _INC_IO
 
+#include <sys/types.h>
 #include <dosix/compiler.h>
 
 #ifndef _DOSIX_LIBC_SRC

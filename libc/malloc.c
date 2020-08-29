@@ -43,7 +43,7 @@ heap_entryinfo_cmp
 
 static
 void
-__bheapchk
+bheapchk
 (const void *nodep,
  VISIT value,
  int level);
@@ -307,7 +307,7 @@ _dosix__nmsize
 
 static
 void
-__bheapchk
+bheapchk
 (const void *nodep,
  VISIT value,
  int level)
@@ -330,7 +330,7 @@ _dosix__bheapchk
     {
       heapstatus = _HEAPOK;
       twalk (&heap_tree,
-	     &__bheapchk);
+	     &bheapchk);
       return heapstatus;
     }
   else switch (mprobe (seg))
