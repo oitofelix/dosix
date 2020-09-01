@@ -51,13 +51,8 @@ bheapchk
 
 /* global variables */
 
-static
-void
-*heap_tree;
-
-static
-int
-heapstatus;
+static _HEAPINFO **heap_tree = NULL;
+static int heapstatus = _HEAPOK;
 
 
 /* auxiliary functions */
@@ -315,7 +310,7 @@ bheapchk
   if (value != leaf && value != preorder
       || heapstatus != _HEAPOK)
     return;
-  const _HEAPINFO *entryinfo = nodep;
+  const _HEAPINFO *entryinfo = *nodep;
   assert (entryinfo->_pentry);
   int status = _dosix__bheapchk (entryinfo->_pentry);
   if (status != _HEAPOK)

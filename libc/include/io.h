@@ -25,9 +25,11 @@
 
 #ifndef _DOSIX_LIBC_SRC
 #define _filelength _dosix__filelength
+#define _isatty _dosix__isatty
 
 #ifndef __STRICT_ANSI__
-#define filelength _dosix__filelength
+#define filelength _filelength
+#define isatty _isatty
 #endif	/* ! __STRICT_ANSI__ */
 
 #endif	/* ! _DOSIX_LIBC_SRC */
@@ -36,6 +38,7 @@
 extern "C" {
 #endif
   off_t __cdecl _dosix__filelength (int);
+  int __cdecl _dosix__isatty (int);
 #ifdef __cplusplus
 }
 #endif

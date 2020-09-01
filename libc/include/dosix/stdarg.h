@@ -1,5 +1,5 @@
 /*
-  time.h -- Date and time
+  stdarg.h -- Support for variable argument functions (ISO)
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,23 +17,14 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOSIX_TIME
-#define _INC_DOSIX_TIME
+#ifndef _INC_DOSIX_STDARG
+#define _INC_DOSIX_STDARG
 
+#include <stdarg.h>
 #include <dosix/compiler.h>
 
-#ifndef _DOSIX_LIBC_SRC
-#define _strtime _dosix__strtime
-#define _strdate _dosix__strdate
-#endif	/* ! _DOSIX_LIBC_SRC */
+#define _dosix_va_start va_start
+#define _dosix_va_arg va_arg
+#define _dosix_va_end va_end
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-  char * __cdecl _dosix__strtime (char *timestr);
-  char * __cdecl _dosix__strdate (char *datestr);
-#ifdef __cplusplus
-}
-#endif
-
-#endif	/* ! _INC_DOSIX_TIME */
+#endif	/* ! _INC_DOSIX_STDARG */

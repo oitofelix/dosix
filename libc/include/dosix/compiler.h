@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOS_COMPILER
-#define _INC_DOS_COMPILER
+#ifndef _INC_DOSIX_COMPILER
+#define _INC_DOSIX_COMPILER
 
 #define __huge
 #define _huge __huge
@@ -35,4 +35,4 @@
 #define __segment void *
 #define _segment __segment
 
-#endif	/* ! _INC_DOS_COMPILER */
+#endif	/* ! _INC_DOSIX_COMPILER */

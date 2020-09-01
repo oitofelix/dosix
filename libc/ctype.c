@@ -28,6 +28,7 @@
 
 /* predicates */
 
+inline
 int
 _dosix_isalnum
 (int c)
@@ -35,6 +36,7 @@ _dosix_isalnum
   return isalnum (c);
 }
 
+inline
 int
 _dosix_isalpha
 (int c)
@@ -42,6 +44,7 @@ _dosix_isalpha
   return isalpha (c);
 }
 
+inline
 int
 _dosix__isascii
 (int c)
@@ -49,6 +52,7 @@ _dosix__isascii
   return isascii (c);
 }
 
+inline
 int
 _dosix_iscntrl
 (int c)
@@ -56,6 +60,7 @@ _dosix_iscntrl
   return iscntrl (c);
 }
 
+inline
 int
 _dosix___iscsym
 (int c)
@@ -65,6 +70,7 @@ _dosix___iscsym
     || c == '_';
 }
 
+inline
 int
 _dosix___iscsymf
 (int c)
@@ -74,6 +80,7 @@ _dosix___iscsymf
     || c == '_';
 }
 
+inline
 int
 _dosix_isdigit
 (int c)
@@ -81,6 +88,7 @@ _dosix_isdigit
   return isdigit (c);
 }
 
+inline
 int
 _dosix_isgraph
 (int c)
@@ -88,6 +96,7 @@ _dosix_isgraph
   return isgraph (c);
 }
 
+inline
 int
 _dosix_islower
 (int c)
@@ -95,6 +104,7 @@ _dosix_islower
   return islower (c);
 }
 
+inline
 int
 _dosix_isprint
 (int c)
@@ -102,6 +112,7 @@ _dosix_isprint
   return isprint (c);
 }
 
+inline
 int
 _dosix_ispunct
 (int c)
@@ -109,6 +120,7 @@ _dosix_ispunct
   return ispunct (c);
 }
 
+inline
 int
 _dosix_isspace
 (int c)
@@ -116,6 +128,7 @@ _dosix_isspace
   return isspace (c);
 }
 
+inline
 int
 _dosix_isupper
 (int c)
@@ -123,6 +136,7 @@ _dosix_isupper
   return isupper (c);
 }
 
+inline
 int
 _dosix_isxdigit
 (int c)
@@ -133,6 +147,7 @@ _dosix_isxdigit
 
 /* conversion */
 
+inline
 int
 _dosix__toascii
 (int c)
@@ -140,6 +155,7 @@ _dosix__toascii
   return toascii (c);
 }
 
+inline
 int
 _dosix_tolower
 (int c)
@@ -147,6 +163,7 @@ _dosix_tolower
   return tolower (c);
 }
 
+inline
 int
 _dosix__tolower
 (int c)
@@ -154,6 +171,7 @@ _dosix__tolower
   return _tolower (c);
 }
 
+inline
 int
 _dosix_toupper
 (int c)
@@ -161,6 +179,7 @@ _dosix_toupper
   return toupper (c);
 }
 
+inline
 int
 _dosix__toupper
 (int c)

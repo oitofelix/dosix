@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOS_FCNTL
-#define _INC_DOS_FCNTL
+#ifndef _INC_DOSIX_FCNTL
+#define _INC_DOSIX_FCNTL
 
 #include <dosix/compiler.h>
 
@@ -51,4 +51,4 @@
 #endif	/* ! __STRICT_ANSI__ */
 #endif /* ! _DOSIX_LIBC_SRC */
 
-#endif	/* ! _INC_DOS_FCNTL */
+#endif	/* ! _INC_DOSIX_FCNTL */

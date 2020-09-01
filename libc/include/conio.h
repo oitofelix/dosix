@@ -23,17 +23,21 @@
 #include <dosix/compiler.h>
 
 #ifndef _DOSIX_LIBC_SRC
-#define _cputs _dosix__cputs
-#define _getch _dosix__getch
-#define _getche _dosix__getche
-#define _putch _dosix__putch
+#  define _cputs _dosix__cputs
+#  define _getch _dosix__getch
+#  define _getche _dosix__getche
+#  define _putch _dosix__putch
+#  define _cprintf _dosix__cprintf
+#  define _cscanf _dosix__cscanf
 
-#ifndef __STRICT_ANSI__
-#define cputs _cputs
-#define getch _getch
-#define getche _getche
-#define putch _putch
-#endif	/* ! __STRICT_ANSI__ */
+#  ifndef __STRICT_ANSI__
+#    define cputs _cputs
+#    define getch _getch
+#    define getche _getche
+#    define putch _putch
+#    define cprintf _cprintf
+#    define cscanf _cscanf
+#  endif  /* ! __STRICT_ANSI__ */
 
 #endif	/* ! _DOSIX_LIBC_SRC */
 
@@ -44,6 +48,8 @@ extern "C" {
   int __cdecl _dosix__getch (void);
   int __cdecl _dosix__getche (void);
   int __cdecl _dosix__putch (int);
+  int __cdecl _dosix__cprintf (const char *, ...);
+  int __cdecl _dosix_cscanf (const char *, ...);
 #ifdef __cplusplus
 }
 #endif

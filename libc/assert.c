@@ -1,5 +1,5 @@
 /*
-  time.h -- Date and time
+  assert.c -- Assert function
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,23 +17,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOSIX_TIME
-#define _INC_DOSIX_TIME
+#define _DOSIX_LIBC_SRC
+#define _GNU_SOURCE
 
-#include <dosix/compiler.h>
+
+/* DOSix headers */
+#include <dosix/assert.h>
+#include <dosix/stdio.h>
 
-#ifndef _DOSIX_LIBC_SRC
-#define _strtime _dosix__strtime
-#define _strdate _dosix__strdate
-#endif	/* ! _DOSIX_LIBC_SRC */
+
+/* assert */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-  char * __cdecl _dosix__strtime (char *timestr);
-  char * __cdecl _dosix__strdate (char *datestr);
-#ifdef __cplusplus
+void
+_dosix__assert
+(const char *expression, const char *filename, size_t lineno)
+{
+  _dosix_fprintf (stderr,
+		  "Assertion failed: %s, file %s, line %zd",
+		  expression,
+		  filename,
+		  lineno); /* ignore fprintf error */
 }
-#endif
-
-#endif	/* ! _INC_DOSIX_TIME */

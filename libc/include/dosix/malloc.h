@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOS_MALLOC
-#define _INC_DOS_MALLOC
+#ifndef _INC_DOSIX_MALLOC
+#define _INC_DOSIX_MALLOC
 
 #include <stddef.h>
 #include <dosix/compiler.h>
@@ -115,4 +115,4 @@ extern "C" {
 }
 #endif
 
-#endif	/* ! _INC_DOS_MALLOC */
+#endif	/* ! _INC_DOSIX_MALLOC */

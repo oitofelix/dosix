@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOS_STRING
-#define _INC_DOS_STRING
+#ifndef _INC_DOSIX_STRING
+#define _INC_DOSIX_STRING
 
 #include <stddef.h>
 #include <dosix/compiler.h>
@@ -81,4 +81,4 @@ extern "C" {
 }
 #endif
 
-#endif	/* ! _INC_DOS_STRING */
+#endif	/* ! _INC_DOSIX_STRING */

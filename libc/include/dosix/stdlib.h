@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOS_STDLIB
-#define _INC_DOS_STDLIB
+#ifndef _INC_DOSIX_STDLIB
+#define _INC_DOSIX_STDLIB
 
 #include <stddef.h>
 #include <limits.h>
@@ -113,4 +113,4 @@ extern "C" {
 }
 #endif
 
-#endif	/* ! _INC_DOS_STDLIB */
+#endif	/* ! _INC_DOSIX_STDLIB */

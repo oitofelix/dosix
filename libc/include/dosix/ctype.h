@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOS_CTYPE
-#define _INC_DOS_CTYPE
+#ifndef _INC_DOSIX_CTYPE
+#define _INC_DOSIX_CTYPE
 
 #include <dosix/compiler.h>
 
@@ -80,4 +80,4 @@ extern "C" {
 }
 #endif
 
-#endif	/* ! _INC_DOS_CTYPE */
+#endif	/* ! _INC_DOSIX_CTYPE */

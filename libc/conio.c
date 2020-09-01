@@ -21,14 +21,26 @@
 #define _GNU_SOURCE
 
 
-/* headers */
-#include <assert.h>
+/* system headers */
 #include <stdbool.h>
 #include <errno.h>
 #include <stdio.h>
-#include <conio.h>
 #include <termios.h>
 #include <unistd.h>
+#include <stdlib.h>
+
+
+/* DOSix headers */
+#include <dosix/assert.h>
+#include <dosix/stdarg.h>
+#include <io.h>
+#include <conio.h>
+
+
+/* private global variables */
+
+static bool ungetch_full = false;
+static char ungetch_char = '\0';
 
 
 /* _cputs */
@@ -36,7 +48,7 @@ int
 _dosix__cputs
 (const char *string)
 {
-  assert (string);
+  _dosix_assert (string);
   for (size_t i = 0; string[i]; i++)
     if (_dosix__putch (string[i]) == EOF)
       return -1; /* return non-zero value on error */
@@ -50,28 +62,35 @@ int
 getch
 (int echo)
 {
+  if (ungetch_full)
+    {
+      ungetch_full = false;
+      return ungetch_char;
+    }
   struct termios termios_prev, termios_curr;
-  int ttyp = isatty (STDIN_FILENO);
-  /* disable terminal echo */
+  int ttyp = _dosix__isatty (STDIN_FILENO);
+  /* setup terminal input mode */
   if (ttyp)
     {
       if (tcgetattr (STDIN_FILENO, &termios_prev) < 0)
-	assert (true);	/* ignore error */
+	_dosix_assert (true); /* ignore error */
       termios_curr = termios_prev;
       termios_curr.c_lflag &= ~ICANON;
       termios_curr.c_lflag = echo
 	? termios_curr.c_lflag | ECHO
 	: termios_curr.c_lflag & ~ECHO;
       if (tcsetattr (STDIN_FILENO, TCSANOW, &termios_curr) < 0)
-	assert (true);	/* ignore error */
+	_dosix_assert (true); /* ignore error */
     }
   char c;
-  if (read (STDIN_FILENO, &c, sizeof (c)) <= 0)
-    assert (true); /* ignore error */
+  int ret = read (STDIN_FILENO, &c, sizeof (c)) <= 0
+    ? EOF			/* not required by documentation, but
+				   might be useful while compatible */
+    : c;
   /* restore terminal settings */
   if (ttyp && tcsetattr (STDIN_FILENO, TCSANOW, &termios_prev) < 0)
-    assert (true); /* ignore error */
-  return c;
+    _dosix_assert (true); /* ignore error */
+  return ret;
 }
 
 int
@@ -89,6 +108,21 @@ _dosix__getche
 }
 
 
+/* _ungetch */
+
+int
+_ungetch
+(int c)
+{
+  if (ungetch_full)
+    return EOF;
+  ungetch_full = true;
+  ungetch_char = c;
+  return c;
+}
+
+
+
 /* _putch */
 
 int
@@ -104,4 +138,56 @@ _dosix__putch
   return count < 0
     ? EOF
     : c;
+}
+
+
+/* _cprintf */
+
+int
+_dosix__cprintf
+(const char *format,
+ ...)
+{
+  char *string = NULL;
+  va_list ap;
+  _dosix_va_start (ap, format);
+  if (vasprintf (&string,
+		 format,
+		 ap) < 0)
+    {
+      free (string); /* harmless; just to make sure */
+      _dosix_va_end (ap);
+      return 0;
+    }
+  _dosix_assert (string);
+  size_t count;
+  for (count = 0; string[count]; count++)
+    if (_dosix__putch (string[count]) == EOF)
+      break;
+  free (string);
+  _dosix_va_end (ap);
+  return count;
+}
+
+
+/* _cscanf */
+
+int
+_dosix_cscanf
+(const char *format,
+ ...)
+{
+  /* Couldn’t find a way to implement this in terms of _getche and the
+     underlying C library’s scanf facilities.  A re-implementation
+     might not be worth it. */
+  va_list ap;
+  _dosix_va_start (ap,
+		   format);
+  /* _ungetch hack */
+  if (getch_full && _dosix_ungetc (ungetch_char, stdin) != EOF)
+    ungetch_full = false;
+  int count = vscanf (format,
+		      ap);
+  _dosix_va_end (ap);
+  return count;
 }

@@ -1,5 +1,5 @@
 /*
-  time.h -- Date and time
+  assert.h -- Assert macro
 
   Copyright (C) 2020 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,23 +17,31 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INC_DOSIX_TIME
-#define _INC_DOSIX_TIME
+#ifndef _INC_DOSIX_ASSERT
+#define _INC_DOSIX_ASSERT
 
+#include <stddef.h>
 #include <dosix/compiler.h>
 
 #ifndef _DOSIX_LIBC_SRC
-#define _strtime _dosix__strtime
-#define _strdate _dosix__strdate
-#endif	/* ! _DOSIX_LIBC_SRC */
+#  undef assert
+#  define assert _dosix_assert
+#endif	/* ! DOSIX_LIBC_SRC */
 
-#ifdef __cplusplus
+#ifdef NDEBUG
+#  define _dosix_assert(expression) ((void) 0)
+#else
+#define _dosix_assert(expression)			\
+  ((expression)						\
+   ? (void) 0						\
+   : _dosix__assert (#expression, __FILE__, __LINE__))
+#  ifdef __cplusplus
 extern "C" {
-#endif
-  char * __cdecl _dosix__strtime (char *timestr);
-  char * __cdecl _dosix__strdate (char *datestr);
-#ifdef __cplusplus
+#  endif
+  void __cdecl _dosix__assert (const char *, const char *, size_t);
+#  ifdef __cplusplus
 }
-#endif
+#  endif
+#endif /* ! NDEBUG */
 
-#endif	/* ! _INC_DOSIX_TIME */
+#endif	/* ! _INC_DOSIX_ASSERT */

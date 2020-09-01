@@ -24,6 +24,7 @@
 /* headers */
 
 #include <sys/stat.h>
+#include <unistd.h>
 #include <io.h>
 
 
@@ -37,4 +38,15 @@ _dosix__filelength
   if (fstat (handle, &fs))
       return -1L;
   return fs.st_size;
+}
+
+
+/* _isatty */
+
+int
+_dosix__isatty
+(int handle)
+{
+  return
+    isatty (handle);
 }
